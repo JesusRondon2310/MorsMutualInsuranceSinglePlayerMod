@@ -54,9 +54,9 @@ namespace MMI_SP
         /// </summary>
         internal void Create()
         {
-            // Banner (descomentar si se desea usar imagen)
-            // if (System.IO.File.Exists(Config.BannerImage))
-            //     _mainMenu.SetBannerType(Config.BannerImage);
+            // Banner(descomentar si se desea usar imagen)
+             if (System.IO.File.Exists(Config.BannerImage))
+                _mainMenu.SetBannerType(Config.BannerImage);
 
             if (OpenedFromiFruit)
             {

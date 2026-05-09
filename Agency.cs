@@ -148,12 +148,12 @@ namespace MMI_SP.Agency
         private void CreateMenuMMI()
         {
             _menuMMI = new MenuMMI();
-            _menuMMI.OnMainMenuClosed(() =>
-            {
-                if (_office != null)
-                    _office.NpcSay(DialogueManager.SpeechType.OfficeBye);
-                ExitAgency();
-            });
+            //_menuMMI.OnMainMenuClosed(() =>
+            //{
+            //    if (_office != null)
+            //        _office.NpcSay(DialogueManager.SpeechType.OfficeBye);
+            //    ExitAgency();
+            //});
             _menuMMI.Create();
             _menuMMI.Show();
         }
