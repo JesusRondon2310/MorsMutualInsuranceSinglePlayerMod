@@ -16,7 +16,7 @@ namespace MMI_SP.Agency
         public static Vector3 Position { get => _position; }
 
         internal Vector3 GetPosition() { return _position; }
-        
+
         // Menus
         private MenuMMI _menuMMI = null;
         internal MenuMMI GetMenu() { return _menuMMI; }
@@ -42,11 +42,6 @@ namespace MMI_SP.Agency
 
         void Initialize(object sender, EventArgs e)
         {
-            while (!InsuranceObserver.Initialized)
-            {
-                Yield();
-            }
-            
             _agencyBlip = CreateBlip();
 
             if (Game.Player.Character.Position.DistanceTo(OfficePlayerPos) <= 2.0f)
@@ -148,12 +143,12 @@ namespace MMI_SP.Agency
         private void CreateMenuMMI()
         {
             _menuMMI = new MenuMMI();
-            //_menuMMI.OnMainMenuClosed(() =>
-            //{
-            //    if (_office != null)
-            //        _office.NpcSay(DialogueManager.SpeechType.OfficeBye);
-            //    ExitAgency();
-            //});
+            _menuMMI.OnMainMenuClosed(() =>
+            {
+                if (_office != null)
+                    //_office.NpcSay(DialogueManager.SpeechType.OfficeBye);
+                ExitAgency();
+            });
             _menuMMI.Create();
             _menuMMI.Show();
         }
@@ -162,7 +157,7 @@ namespace MMI_SP.Agency
         {
 
             Logger.Debug("Reset the menu");
-            
+
             try
             {
                 // Crear el menú si aún no existe
@@ -255,7 +250,7 @@ namespace MMI_SP.Agency
             // Teleport the player to the entrance
             Game.Player.Character.IsPositionFrozen = false;
             Game.Player.Character.Position = _position;
-            
+
             // Force load spawn point
             Function.Call(Hash.LOAD_SCENE, _position.X, _position.Y, _position.Z);
             // Wait until everything is loaded
