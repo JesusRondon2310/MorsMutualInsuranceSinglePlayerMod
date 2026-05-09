@@ -12,7 +12,6 @@ using static MMI_SP.DialogueManager;
 
 namespace MMI_SP
 {
-    using T = Translator;
 
     public class InsuranceObserver : Script
     {
@@ -246,7 +245,7 @@ namespace MMI_SP
                     {
                         string vehIdentifier = Utils.Vehicle.GetVehicleIdentifier(currenVeh);
 
-                        GTA.UI.Notification.Show(GTA.UI.NotificationIcon.MpMorsMutual, "MORS MUTUAL INSURANCE", T.GetString("NotifyVehicleDestroyedTitle"), T.GetString("NotifyVehicleDestroyedSubtitle"));
+                        GTA.UI.Notification.Show(GTA.UI.NotificationIcon.MpMorsMutual, "MORS MUTUAL INSURANCE", "VEHÍCULO DESTRUIDO", "Tu vehículo ha sido destruido. Llama a Mors Mutual para recuperarlo.");
                         Audio.PlaySoundFrontend("Text_Arrive_Tone", Utils.Phone.GetPhoneSoundSet());
 
                         _im.SetVehicleStatusToDB(vehIdentifier, "Dead");
@@ -304,7 +303,7 @@ namespace MMI_SP
                     {
                         if (recoveredVehicle.IsAlive)
                         {
-                            GTA.UI.Notification.Show(GTA.UI.NotificationIcon.MpMorsMutual, "MORS MUTUAL INSURANCE", T.GetString("NotifyVehicleRecoveredTitle"), T.GetString("NotifyVehicleRecoveredSubtitle"));
+                            GTA.UI.Notification.Show(GTA.UI.NotificationIcon.MpMorsMutual, "MORS MUTUAL INSURANCE", "VEHÍCULO RECUPERADO", "Tu vehículo ha sido recuperado. Pásate por el depósito.");
                             Audio.PlaySoundFrontend("Text_Arrive_Tone", Utils.Phone.GetPhoneSoundSet());
                         }
 
@@ -496,7 +495,7 @@ namespace MMI_SP
 
         internal void CannotBringVehicle(IncomingVehicle incoming, int refund = 0)
         {
-            GTA.UI.Notification.Show(GTA.UI.NotificationIcon.MpMorsMutual, "MORS MUTUAL INSURANCE", T.GetString("BringVehicle"), T.GetString("NotifyBringVehicleCancel"));
+            GTA.UI.Notification.Show(GTA.UI.NotificationIcon.MpMorsMutual, "MORS MUTUAL INSURANCE", "Solicitando vehículo...", "No se pudo traer el vehículo.");
 
             // Refund the player
             if (refund == 0)
