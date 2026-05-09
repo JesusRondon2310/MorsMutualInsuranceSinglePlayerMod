@@ -48,7 +48,6 @@ namespace MMI_SP.Agency
             }
             
             _agencyBlip = CreateBlip();
-            CreateMenuMMI();
 
             if (Game.Player.Character.Position.DistanceTo(OfficePlayerPos) <= 2.0f)
             {
@@ -166,6 +165,10 @@ namespace MMI_SP.Agency
             
             try
             {
+                // Crear el menú si aún no existe
+                if (_menuMMI == null)
+                    CreateMenuMMI();
+
                 // Reset the menu
                 _menuMMI.Reset();
             }
