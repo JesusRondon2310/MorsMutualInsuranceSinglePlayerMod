@@ -116,6 +116,8 @@ namespace MMI_SP
 
         private void BuildItemInsure()
         {
+            if (InsuranceManager.Instance == null) return;
+
             Vehicle veh = Game.Player.LastVehicle;
             if (veh == null || !veh.Exists()) return;
 
@@ -246,6 +248,13 @@ namespace MMI_SP
         private void RebuildMenuRecover()
         {
             _submenuRecover.Clear();
+
+            if (InsuranceManager.Instance == null)
+            {
+                AddEmptyItem(_submenuRecover, "No tienes vehículos destruidos que recuperar.");
+                return;
+            }
+
             string currentCharacter = Game.Player.Character.Model.Hash.ToString();
             List<string> deadVehicleList = InsuranceManager.GetInsuredVehicles(currentCharacter, true);
 
@@ -383,6 +392,9 @@ namespace MMI_SP
 
         private List<string> GetInsuredVehicleList()
         {
+            if (InsuranceManager.Instance == null)
+                return new List<string>();
+
             string currentCharacter = Game.Player.Character.Model.Hash.ToString();
             List<string> vehicleList = InsuranceManager.GetInsuredVehicles(currentCharacter, false);
             vehicleList.AddRange(InsuranceManager.GetInsuredVehicles(currentCharacter, true));
