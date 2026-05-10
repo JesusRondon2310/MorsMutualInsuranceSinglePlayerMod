@@ -30,6 +30,8 @@ namespace MMI_SP.Agency.Menu
             Game.Player.Money -= cost;
             Core.Insure(lastVeh);
             Notification.Show(NotifyChar, NotifyTitle, "Vehículo asegurado correctamente.", "");
+
+            Execute.Rebuild(sender);
         }
     }
 }
