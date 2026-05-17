@@ -12,6 +12,7 @@ namespace MMI_SP
         internal static readonly string BaseDir = AppDomain.CurrentDomain.BaseDirectory + "\\MMI";
         internal static readonly string BannerImage = BaseDir + "\\banner.png";
         public static float InsuranceMult { get; } = 1.0f;
+        public static bool PersistentVehicles { get; } = true;
 
         // ==========================================
         // BLOQUE 2: Funciones

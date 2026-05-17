@@ -113,6 +113,12 @@
     <Compile Include="Insurance\Manager\Repository.cs" />
     <Compile Include="Insurance\Manager\VehicleData.cs" />
     <Compile Include="Insurance\Manager\VehicleDataFactory.cs" />
+    <Compile Include="Insurance\Observer\BlipManager.cs" />
+    <Compile Include="Insurance\Observer\Manager.cs" />
+    <Compile Include="Insurance\Observer\PersistenceManager.cs" />
+    <Compile Include="Insurance\Observer\RecoveryManager.cs" />
+    <Compile Include="Insurance\Observer\VehicleChangeHandler.cs" />
+    <Compile Include="Insurance\Observer\VehicleMonitor.cs" />
     <Compile Include="Insurance\Recover\Coordinates.cs" />
     <Compile Include="Insurance\Recover\Manager.cs" />
     <Compile Include="MMI.cs" />

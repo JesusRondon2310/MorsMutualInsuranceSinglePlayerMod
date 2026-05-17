@@ -11,6 +11,9 @@ namespace MMI_SP.Insurance
         // BLOQUE 1: Datos
         // ==========================================
         private List<VehicleData> _insuredVehicles;
+        internal static Insurer Instance { get; private set; }
+
+        internal Insurer() { Instance = this; }
 
         internal void LoadFrom(List<VehicleData> list) => _insuredVehicles = list;
 

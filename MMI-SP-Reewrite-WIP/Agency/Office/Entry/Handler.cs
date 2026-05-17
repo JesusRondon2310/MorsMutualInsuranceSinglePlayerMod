@@ -14,6 +14,7 @@ namespace MMI_SP.Agency.Office.Entry
         private readonly CutsceneManager _cutscene;
         private readonly UI _menu;
         private bool _isExiting = false;
+        private bool _isInside = false;
 
         public Handler(Script script)
         {
@@ -28,6 +29,7 @@ namespace MMI_SP.Agency.Office.Entry
         public void Enter()
         {
             _isExiting = false;
+            _isInside = true;
 
             var result = EnterSequence.Execute(_menu, _cutscene, _office);
 
@@ -45,11 +47,13 @@ namespace MMI_SP.Agency.Office.Entry
 
         public void Exit()
         {
+            _isInside = false;
             ExitSequence.Execute(_office, _cutscene);
         }
 
         public void ErrorCancel(bool menu = true)
         {
+            _isInside = false;
             CancelSequence.Execute(_menu, _cutscene, menu);
         }
 
@@ -59,7 +63,7 @@ namespace MMI_SP.Agency.Office.Entry
             _office.UpdateSpeechTimer();
             _menu?.Update();
 
-            if (_menu != null && !_menu.IsAnyMenuVisible() && !_isExiting)
+            if (_isInside && _menu != null && !_menu.IsAnyMenuVisible() && !_isExiting)
             {
                 Logger.Debug($"MainMenu visible: {_menu.IsMainMenuVisible()}, Submenu visible: {_menu.IsSubmenuVisible()}");
                 _isExiting = true;
