@@ -33,9 +33,9 @@ namespace MMI_SP.Insurance
         public static bool IsInsured(Vehicle veh) => _manager?.IsInsured(veh) ?? false;
         public static bool IsInsurable(Vehicle veh) => Insurer.IsInsurable(veh);
         public static int GetCost(Vehicle veh) => Calculator.GetCost(veh);
-        public static List<VehicleData> GetActiveList() => _manager?.GetActiveList() ?? new List<VehicleData>();
-        public static List<VehicleData> GetDestroyedList() => _manager?.GetDestroyedList() ?? new List<VehicleData>();
-        public static VehicleData FindById(string vehicleId) => _manager?.FindById(vehicleId);
+        internal static List<VehicleData> GetActiveList() => _manager?.GetActiveList() ?? new List<VehicleData>();
+        internal static List<VehicleData> GetDestroyedList() => _manager?.GetDestroyedList() ?? new List<VehicleData>();
+        internal static VehicleData FindById(string vehicleId) => _manager?.FindById(vehicleId);
 
         public static Result<bool> Insure(in Vehicle veh)
         {

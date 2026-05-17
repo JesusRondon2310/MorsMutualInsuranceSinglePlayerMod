@@ -6,12 +6,12 @@ using MMI_SP.PatternMatching;
 
 namespace MMI_SP.Insurance.Recover
 {
-    public static class Manager
+    internal static class Manager
     {
         // ==========================================
         // BLOQUE: Funciones
         // ==========================================
-        public static Result<bool> RecoverVehicle(string vehicleId, Insurer insurer)
+        internal static Result<bool> RecoverVehicle(string vehicleId, Insurer insurer)
         {
             VehicleData data = insurer.FindById(vehicleId);
             if (data == null) return new Err<bool>("Vehículo no encontrado en la póliza.");
