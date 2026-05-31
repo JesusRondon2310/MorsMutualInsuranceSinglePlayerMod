@@ -1,0 +1,231 @@
+================================================================================
+SISTEMA DE ORQUESTACIÓN MODULAR (SOM)
+Documentación completa y actualizada
+================================================================================
+
+## INDICE
+
+1. ¿Qué es SOM?
+2. Principios fundamentales
+3. Niveles de profundidad y nomenclatura de archivos
+4. Roles de los archivos (Orquestador, Mini-Orquestador, Interno)
+5. Reglas de encapsulamiento y acceso
+6. Convenciones de código
+7. Excepciones controladas (el 20% mutable)
+8. Ejemplo práctico: estructura de MMI-SP
+9. Comparación con otros patrones
+10. Origen y filosofía
+
+================================================================================
+
+1. # ¿QUÉ ES SOM?
+
+SOM (Sistema de Orquestación Modular) es un patrón de arquitectura de software
+que organiza el código en módulos independientes y encapsulados, donde cada
+módulo expone un único punto de entrada público (el orquestador) y mantiene
+todo su funcionamiento interno oculto al resto de la aplicación.
+
+Nació de la adaptación del sistema de módulos de Rust a C#, y es aplicable a
+cualquier lenguaje que permita distinguir entre código público y privado.
+
+# ================================================================================ 2. PRINCIPIOS FUNDAMENTALES
+
+## 2.1. Un orquestador por módulo
+
+Cada módulo tiene un único archivo o clase pública que actúa como punto de
+entrada. Nadie más en el módulo es visible desde fuera.
+
+## 2.2. Encapsulamiento estricto
+
+Todas las clases, funciones y estructuras internas del módulo son inaccesibles
+desde otros módulos. El compilador, el intérprete o el sistema de build lo
+imponen.
+
+## 2.3. Archivos pequeños y responsables
+
+Cada archivo tiene una sola responsabilidad. No hay archivos de 300 líneas que
+mezclen lógica de negocio, persistencia y UI.
+
+## 2.4. Trazabilidad directa
+
+El flujo de ejecución es lineal y predecible. Una acción en el menú llama al
+orquestador, que delega en sus internos. El stack trace señala exactamente
+dónde falló algo.
+
+## 2.5. Independencia entre módulos
+
+Los módulos no se acoplan entre sí. Si Insurance falla, Agency no se entera.
+Si Agency necesita algo de Insurance, lo pide a través de su orquestador
+público.
+
+# ================================================================================ 3. NIVELES DE PROFUNDIDAD Y NOMENCLATURA DE ARCHIVOS
+
+Los módulos se organizan en carpetas con un máximo de 3 niveles de profundidad
+desde la raíz del proyecto.
+
+Cada nivel tiene un nombre de archivo específico para su orquestador:
+
+Nivel 1: Core.cs - Es el orquestador principal del módulo de primer nivel. - Ejemplo: Insurance/Core.cs
+
+Nivel 2: Manager.cs - Es el orquestador del submódulo de segundo nivel. - Coordina un conjunto de funcionalidades relacionadas. - Ejemplo: Insurance/Observer/Manager.cs
+
+Nivel 3: Handler.cs - Es el orquestador del submódulo de tercer nivel. - Contiene la lógica de negocio específica y coordina componentes internos. - Ejemplo: Insurance/Observer/Delivery/Handler.cs
+
+Los archivos que no son orquestadores se nombran según su responsabilidad
+específica (VehicleMonitor.cs, BlipManager.cs, etc.).
+
+# ================================================================================ 4. ROLES DE LOS ARCHIVOS
+
+## 4.1. Orquestador principal del módulo
+
+- Es el único punto de entrada público del módulo.
+- Coordina a los mini-orquestadores y componentes internos.
+- Nombres reservados: Core.cs (nivel 1), Manager.cs (nivel 2), Handler.cs (nivel 3).
+- No depende de ningún otro archivo dentro del mismo nivel.
+
+## 4.2. Mini-Orquestador
+
+- Es un archivo interno (internal).
+- Contiene lógica de negocio específica.
+- Coordina otros componentes internos.
+- Depende del orquestador principal de su módulo.
+- Nomenclatura: NombreEspecificoHandler.cs (ej: NpcHandler.cs).
+- Ejemplo: NpcHandler.cs depende de Office/Ambient/Handler.cs.
+
+## 4.3. Componente interno
+
+- Clases internal que no son orquestadores ni mini-orquestadores.
+- Pueden ser structs de datos, helpers, factories, etc.
+- Ejemplos: EntityPosition.cs, DeliveryHelpers.cs, Tracking.cs.
+
+# ================================================================================ 5. REGLAS DE ENCAPSULAMIENTO Y ACCESO
+
+## 5.1. Visibilidad
+
+- Orquestador principal: public (solo él es accesible desde fuera).
+- Mini-orquestadores: internal (solo visibles dentro del mismo módulo).
+- Componentes internos: internal (solo visibles dentro del mismo módulo).
+
+## 5.2. Dependencias
+
+- El orquestador principal (nivel 1) depende de sus Managers (nivel 2).
+- El Manager (nivel 2) depende de sus Handlers (nivel 3) y mini-orquestadores.
+- El Handler (nivel 3) depende de sus mini-orquestadores y componentes internos.
+- Los componentes internos no dependen de orquestadores ni de otros módulos.
+
+## 5.3. Comunicación entre módulos
+
+- Un módulo solo accede al orquestador público de otro módulo.
+- Nunca accede directamente a sus internos.
+
+# ================================================================================ 6. CONVENCIONES DE CÓDIGO
+
+## 6.1. Nombres de archivos y clases
+
+- Los archivos y las clases públicas principales deben tener el mismo nombre.
+- Las clases internas pueden usar nombres descriptivos según su función.
+
+## 6.2. Comentarios y legibilidad
+
+- Se usan comentarios solo cuando el código no se explica por sí mismo.
+- Los comentarios son breves y no obstructivos.
+- Se evitan comentarios largos que repitan lo que el código ya dice.
+
+## 6.3. Bloques de código
+
+- Se separan visualmente los datos (campos, propiedades, constructores) de
+  las funciones (métodos) mediante comentarios de bloque.
+- Si solo hay un bloque, se usa un comentario simple: "BLOQUE: Funciones".
+
+## 6.4. Estilo de código
+
+- Se prefiere el estilo compacto: if de una sola línea sin llaves, cuando no
+  se salga del ancho de pantalla.
+- Se evita la duplicación de código (DRY) siempre que no fuerce una
+  abstracción innecesaria.
+
+# ================================================================================ 7. EXCEPCIONES CONTROLADAS (EL 20% MUTABLE)
+
+## 7.1. El cascarón POO
+
+- Los módulos que interactúan con APIs externas mutables (NativeUI, SHVDN3)
+  pueden mantener estado mutable interno.
+- Esto incluye referencias a UIMenu, MenuPool, y suscripciones a eventos.
+- Estos módulos representan el 20% del código total.
+
+## 7.2. ¿Cuándo se permite?
+
+- Solo en los módulos de UI (Agency/MainMenu, Agency/Office).
+- En los Observers que heredan de Script y manejan eventos del juego.
+- En helpers que encapsulan llamadas a natives de GTA V.
+
+## 7.3. ¿Cuándo NO se permite?
+
+- En el motor funcional (80% del código): Insurance, cálculos, validaciones.
+- En objetos de dominio (VehicleData, etc.): deben ser inmutables.
+
+# ================================================================================ 8. EJEMPLO PRÁCTICO: ESTRUCTURA DE MMI-SP
+
+Agency/ ← Nivel 1 (Encapsulador)
+├── Core.cs (orquestador público)
+├── Office/ ← Nivel 2 (Encapsulador)
+│ ├── Manager.cs (orquestador)
+│ ├── Ambient/ ← Nivel 3 (Encapsulador)
+│ │ ├── Handler.cs (orquestador nivel 3)
+│ │ └── NpcHandler.cs (mini-orquestador)
+│ ├── Entry/ ← Nivel 3 (Encapsulador)
+│ └── Handler.cs (orquestador nivel 3)
+├── MainMenu/ ← Nivel 2 (Encapsulador)
+│ ├── Manager.cs (orquestador nivel 2)
+│ ├── SubMenus/ ← Nivel 3 (Encapsulador)
+│ ├── CancelHandler.cs (mini-orquestador)
+│ └── (futuro: RecoverHandler.cs)
+├── Buttons/ ← Nivel 2 (Encapsulador)
+├── Build.cs (interno)
+└── Fill.cs (interno)
+
+Insurance/ ← Nivel 1 (Encapsulador)
+├── Core.cs (orquestador público)
+├── Manager/ ← Nivel 2 (Encapsulador)
+│ ├── Manager.cs (orquestador nivel 2)
+│ ├── Insurer.cs (interno)
+│ ├── Calculator.cs (interno)
+│ └── Repository.cs (interno)
+└── Observer/ ← Nivel 2 (Encapsulador)
+├── Manager.cs (orquestador nivel 2)
+├── VehicleMonitor.cs (mini-orquestador)
+├── RecoveryManager.cs (mini-orquestador)
+├── BlipManager.cs (interno)
+├── PersistenceManager.cs (interno)
+│ ├── Delivery/ ← Nivel 3 (Encapsulador)
+│ ├── Handler.cs (orquestador nivel 3)
+│ ├── Tracking.cs (interno)
+│ ├── EntityPosition.cs (interno)
+│ └── DeliveryHelpers.cs (interno)
+└──
+
+# ================================================================================ 9. COMPARACIÓN CON OTROS PATRONES
+
+| Patrón             | Tamaño archivos    | Encapsulamiento | Trazabilidad | Curva aprendizaje |
+| ------------------ | ------------------ | --------------- | ------------ | ----------------- |
+| SOM                | Pequeños (40-80)   | Alto            | Alta         | Baja              |
+| MVC                | Medianos (100-200) | Medio           | Baja         | Media             |
+| Monolítico         | Grandes (300-500)  | Bajo            | Media        | Baja              |
+| Event-driven       | Pequeños           | Muy alto        | Muy baja     | Alta              |
+| Clean Architecture | Pequeños/medianos  | Muy alto        | Baja         | Muy alta          |
+
+# ================================================================================ 10. ORIGEN Y FILOSOFÍA
+
+SOM nace de la adaptación del sistema de módulos de Rust a C#. En Rust, cada
+archivo es un módulo, todo es privado por defecto, y solo lo marcado con 'pub'
+es accesible desde fuera. Esa filosofía de "privado por defecto, público bajo
+demanda" se trasladó a C# usando 'internal' y 'public static class' como
+orquestadores.
+
+"Si Rust puede tener módulos limpios y encapsulados sin herencia ni interfaces
+innecesarias, C# también puede."
+
+"SOM fue concebido durante la migración de MMI-SP a SHVDN3, tras 48 horas
+combatiendo un bug de renderizado en NativeUI y bajo la influencia del sistema
+de módulos de Rust. Lo que empezó como una solución desesperada acabó siendo un
+patrón arquitectónico."
