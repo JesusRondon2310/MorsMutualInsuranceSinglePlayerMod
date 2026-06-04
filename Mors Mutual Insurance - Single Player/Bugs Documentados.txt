@@ -1,0 +1,243 @@
+================================================================================
+MMI-SP REWRITE — REGISTRO UNIFICADO DE BUGS CORREGIDOS
+================================================================================
+Total: 27 bugs
+
+================================================================================
+BUG 1 — Mods de LSC no se guardan
+CAUSA:
+  HandleAliveVehicle en VehicleMonitor tenía la condición GameplayCamera.IsRendering.
+  Dentro de LSC la cámara no renderiza, por lo que el update nunca se ejecutaba.
+SOLUCIÓN:
+  Eliminar GameplayCamera.IsRendering de HandleAliveVehicle.
+ARCHIVO: Insurance/Observer/VehicleMonitor.cs
+
+================================================================================
+BUG 2 — Posición del vehículo no se guarda al aparcar
+CAUSA:
+  UpdateVehicleData solo se ejecutaba mientras el jugador conducía.
+  Al bajarse, la posición no se guardaba.
+SOLUCIÓN:
+  En VehicleChangeHandler, cuando el jugador sale del vehículo, llamar a
+  insurer.UpdateVehicleData(previous) para guardar la posición de aparcamiento.
+ARCHIVO: Insurance/Observer/VehicleChangeHandler.cs
+
+================================================================================
+BUG 3 — IsDestroyed queda en false tras destruir vehículo
+CAUSA:
+  En DestroyedVehicle.Handle se ejecutaba MarkAsDestroyed y luego
+  UpdateVehicleData, que sobrescribía el flag.
+SOLUCIÓN:
+  Eliminar UpdateVehicleData de DestroyedVehicle.Handle.
+ARCHIVO: Insurance/Observer/DestroyedVehicle.cs
+
+================================================================================
+BUG 4 — Vehículos dormantes al entrar a interior (Vector3.Zero insuficiente)
+CAUSA:
+  Al entrar a un interior, el vehículo puede tener posición válida pero lejana,
+  o Vector3.Zero en un frame. La distancia enorme activaba el despawn.
+SOLUCIÓN COMPLETA:
+  1. En HandleExterior: guards de interior y posición inválida.
+  2. En DespawnHandler.Execute: verificar posición inválida y distancia <600m.
+  3. Usar GET_INTERIOR_FROM_ENTITY para detectar interiores.
+ARCHIVOS: Insurance/Observer/AliveVehicleDespawn.cs, Dormancy/DespawnHandler.cs
+
+================================================================================
+BUG 5 — Duplicados tras recuperar del lote policial
+CAUSA:
+  Al recuperar un vehículo del depósito, el Observer lo detectaba como nuevo
+  y lo añadía de nuevo, generando duplicado.
+SOLUCIÓN:
+  En CheckForInsuredVehicles, verificar si ya existe un vehículo con el mismo ID
+  antes de añadirlo a insuredVehList.
+ARCHIVO: Insurance/Observer/VehicleMonitor.cs
+
+================================================================================
+BUG 6 — Vehículos fantasma tras cancelar póliza
+CAUSA:
+  RemoveVehicleObservation llamaba a DB.Core.FindVehicle DESPUÉS de que
+  Manager.Cancel ya había eliminado el vehículo de la DB.
+SOLUCIÓN:
+  En CancelHandler, obtener VehicleData ANTES de cancelar y pasar la clave
+  a RemoveVehicleObservation.
+ARCHIVO: Agency/MainMenu/SubMenus/CancelHandler.cs
+
+================================================================================
+BUG 7 — Dormantes no aparecen al cargar partida
+CAUSA:
+  Initializer ignoraba los vehículos con IsDormant = true.
+SOLUCIÓN:
+  Cuando data.IsDormant == true, añadir a Dormancy.Core.DormantVehicles.
+ARCHIVO: Insurance/Observer/Initializer.cs
+
+================================================================================
+BUG 8 — Pintura incorrecta al recuperar vehículo destruido
+CAUSA:
+  Mismo origen que BUG 3: UpdateVehicleData guardaba colores del vehículo muerto.
+SOLUCIÓN:
+  Eliminar UpdateVehicleData de DestroyedVehicle.Handle.
+ARCHIVO: Insurance/Observer/DestroyedVehicle.cs
+
+================================================================================
+BUG 9 — IsDestroyed: true + IsInGarage: true simultáneamente
+CAUSA:
+  MarkAsDestroyed preservaba IsInGarage del registro original.
+SOLUCIÓN:
+  Forzar isInGarage: false, isDormant: false, isLocked: false en el vehículo destruido.
+ARCHIVO: Insurance/Policies/InsurerOperations.cs
+
+================================================================================
+BUG 10 — Llantas antibalas no se guardan (clave 999)
+CAUSA:
+  Se guardaban como mods[999] en el mismo Dictionary que los mods reales.
+SOLUCIÓN:
+  Añadir campo BulletproofTires (bool) a VehicleData.
+  Capturar con GET_VEHICLE_TYRES_CAN_BURST y restaurar con SET_VEHICLE_TYRES_CAN_BURST.
+ARCHIVOS: DB/VehicleData.cs, DB/VehicleDataBuilder.cs, DB/VehicleSpawnManager.cs
+
+================================================================================
+BUG 11 — Humo de neumáticos no se restaura (TireSmoke)
+CAUSA:
+  Se usaba SET_VEHICLE_MOD con mod 20, que no activa el humo en SHVDN3.
+SOLUCIÓN:
+  Usar veh.Mods[VehicleToggleModType.TireSmoke].IsInstalled = true.
+ARCHIVO: DB/VehicleSpawnManager.cs
+
+================================================================================
+BUG 12 — Llantas antibalas se resetean tras UpdateVehicleData
+CAUSA:
+  UpdateVehicleData preservaba existing.BulletproofTires en vez de leer del vivo.
+  InstallModKit reseteaba la propiedad.
+SOLUCIÓN:
+  Usar updated.BulletproofTires. Restaurar al final del spawn.
+ARCHIVOS: Insurance/Policies/InsurerOperations.cs, DB/VehicleSpawnManager.cs
+
+================================================================================
+BUG 13 — Neón no se restaura al spawnear
+CAUSA:
+  Orden de restauración incorrecto. UpdateVehicleData preservaba valores del existing.
+SOLUCIÓN:
+  1. En UpdateVehicleData usar updated.NeonLeft, updated.NeonColor.
+  2. En SpawnVehicle restaurar neón al final, después de todo.
+ARCHIVOS: Insurance/Policies/InsurerOperations.cs, DB/VehicleSpawnManager.cs
+
+================================================================================
+BUG 14 — Blips no desaparecen al subirse al vehículo
+CAUSA:
+  Inconsistencia de claves entre VehicleKey.FullKeyFrom y vehId.
+SOLUCIÓN:
+  Unificar el formato de clave en todo el sistema usando VehicleKey.FullKeyFrom.
+ARCHIVOS: Insurance/Observer/VehicleMonitor.cs, Helpers/Blips/BlipCleanupHandler.cs
+
+================================================================================
+BUG 15 — Notificaciones MMI sin jerarquía h4+h1+p
+CAUSA:
+  Se usaba PostMessageText que mete todo en h1.
+SOLUCIÓN:
+  Usar el native directamente con iconType = 2 para activar la jerarquía.
+ARCHIVO: Helpers/Notification.cs
+
+================================================================================
+BUG 16 — Mecánico mata al NPC al spawnear encima del vehículo
+CAUSA:
+  El mecánico se spawnaba exactamente en veh.Position.
+SOLUCIÓN:
+  Spawnear a 5 metros detrás usando veh.ForwardVector.
+ARCHIVO: Insurance/Observer/Delivery/Tracking.cs
+
+================================================================================
+BUG 17 — Mecánico no se baja del coche al llegar
+CAUSA:
+  Condiciones de distancia y timer insuficientes.
+SOLUCIÓN:
+  Aumentar radio a 80m, timer a 3000ms, añadir condición isStopped (Speed <= 1.0f).
+ARCHIVO: Insurance/Observer/Delivery/UpdateIncomingHandler.cs
+
+================================================================================
+BUG 18 — Vehículos addon hacen despawn en misiones y se duplican
+CAUSA:
+  HandleMissingVehicle eliminaba el vehículo de insuredVehList durante misiones.
+SOLUCIÓN:
+  Solo eliminar de insuredVehList si IsDestroyed o IsDormant está en true.
+ARCHIVO: Insurance/Observer/VehicleMonitor.cs
+
+================================================================================
+BUG 19 — Vehículos bloqueados a <200m se pierden al cargar partida
+CAUSA:
+  Initializer tenía branch específico para <200m que no spawneaba el vehículo.
+SOLUCIÓN:
+  Eliminar distinción. Si no se encuentra en el mundo, spawnear siempre si <600m.
+ARCHIVO: Insurance/Observer/Initializer.cs
+
+================================================================================
+BUG 20 — Vehículos en garaje desaparecen al guardar desde cama
+CAUSA:
+  Comportamiento nativo de GTA V. Los garajes interiores no se gestionaban bien.
+SOLUCIÓN:
+  En Initializer, saltar los vehículos con IsInGarage = true (se restauran bajo demanda).
+  En Garage.Entry, actualizar IsInGarage = true antes de llamar a RestoreIfNeeded.
+ARCHIVOS: Insurance/Observer/Initializer.cs, Insurance/Observer/Garage.cs
+
+================================================================================
+BUG 21 — IsInGarage no se actualiza a true al entrar al garaje interior
+CAUSA:
+  En Garage.Entry, el branch de interiores hacía return antes de actualizar el flag.
+SOLUCIÓN:
+  Actualizar IsInGarage = true en la BD ANTES de cualquier branch.
+  Pasar updatedData (con IsInGarage = true) a RestoreIfNeeded.
+ARCHIVO: Insurance/Observer/Garage.cs
+
+================================================================================
+BUG 22 — Respawn duplicado al bajarse del vehículo en garaje interior
+CAUSA:
+  Al bajarse, el vehículo aparcado seguía en insuredVehList y se volvía a procesar.
+SOLUCIÓN:
+  En Garage.Entry, verificar si currentVeh == CurrentVehicle.
+  Si no, solo limpiar (no llamar a RestoreIfNeeded).
+ARCHIVO: Insurance/Observer/Garage.cs
+
+================================================================================
+BUG 23 — Duplicados en menú mecánico a >600m
+CAUSA:
+  DormantVehicles no deduplicaba. FillBring mostraba vivos y dormantes juntos.
+SOLUCIÓN:
+  En FillBring, construir HashSet de IDs vivos y saltar dormantes cuyo ID ya esté.
+  En DespawnHandler, evitar añadir dormantes duplicados.
+ARCHIVOS: iFruit/MechanicMenuBuilder.cs, Dormancy/DespawnHandler.cs
+
+================================================================================
+BUG 24 — CancelHandler: vehículo fantasma persiste en menú mecánico
+CAUSA:
+  Mismo origen que BUG 6.
+SOLUCIÓN:
+  Ver BUG 6.
+ARCHIVO: Agency/MainMenu/SubMenus/CancelHandler.cs
+
+================================================================================
+BUG 25 — Spam de errores en el log por vehículos bloqueados
+CAUSA:
+  HandleExterior intentaba despawnear vehículos bloqueados en cada tick.
+SOLUCIÓN:
+  Añadir protección temprana para vehículos con IsLocked = true.
+ARCHIVOS: Insurance/Observer/AliveVehicleDespawn.cs, Dormancy/DespawnHandler.cs
+
+================================================================================
+BUG 26 — Falsos positivos en IsInsured
+CAUSA:
+  Solo se comparaba la placa, no el modelo.
+SOLUCIÓN:
+  Añadir comparación de ModelName en la verificación.
+ARCHIVO: DB/Core.cs (IsInsured)
+
+================================================================================
+BUG 27 — Spawn de addons problemáticos incluso con timeout
+CAUSA:
+  Limitación de SHVDN/C# frente a C++ nativo.
+SOLUCIÓN:
+  Implementar timeout de 1.5s/3s y documentar como limitación conocida.
+  Mensaje humorístico: "Dale las gracias a la kk de C#."
+ARCHIVO: Helpers/Spawn/VehicleSpawnManager.cs
+
+================================================================================
+FIN DEL REGISTRO
+================================================================================
