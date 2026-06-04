@@ -1,9 +1,7 @@
-# MMI-SP-Rewrite
-
+# Mors Mutual Insurance - Single Player
 _Un mod para GTA V_
-**Mors Mutual Insurance - Single Player**
 
-### Basado en el trabajo original de Bob74 (2022)
+### Un derivado, basado en el trabajo original de Bob74 (2022)
 
 [![Vídeo del tráiler](https://user-images.githubusercontent.com/9498543/162617439-42459c98-9915-4a43-b476-c339192e307a.png)](https://www.youtube.com/watch?v=WATdK3aOdGk)
 
@@ -13,7 +11,7 @@ La descarga está disponible [aquí](https://github.com/JesusRondon2310/MMI-SP-R
 
 # Historial de Cambios
 
-# Changelog — MMI-SP-Rewrite
+# Changelog
 
 ## Beta 2 (24/05/2026)
 
