@@ -28,12 +28,12 @@ namespace MMI_SP.Insurance.Delivery
                 if (!t.driver.IsInVehicle(t.vehicle)) continue;
 
                 float distance = t.vehicle.Position.DistanceTo(t.destination);
-                if (distance <= Constants.ARRIVAL_DISTANCE && t.vehicle.Speed < Constants.ARRIVAL_SPEED_THRESHOLD)
+                if (distance <= Constants.ARRIVAL_DISTANCE && t.vehicle.Speed < Constants.ARRIVAL_MINIMUN_SPEED)
                 {
                     // Frenar el vehículo para evitar inercia (mejora añadida, no estaba en original pero ayuda)
                     t.vehicle.Velocity = Vector3.Zero;
                     t.vehicle.WorldRotationVelocity = Vector3.Zero;
-                    Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, t.vehicle, 0f);
+                    Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, t.vehicle, Constants.VEHICLE_STOP_SPEED);
 
                     t.driver.Task.LeaveVehicle();
                     Function.Call(Hash.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS, t.driver, true);

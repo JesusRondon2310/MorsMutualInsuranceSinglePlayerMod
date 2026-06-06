@@ -40,8 +40,8 @@ namespace MMI_SP.Insurance.Delivery
                 incoming.vehicle.LockStatus = VehicleLockStatus.None;
                 incoming.vehicle.IsEngineRunning = true;
                 incoming.driver.SetIntoVehicle(incoming.vehicle, VehicleSeat.Driver);
-                incoming.driver.Task.DriveTo(incoming.vehicle, incoming.destination, Constants.DRIVE_TO_SPEED, 
-                    VehicleDrivingFlags.DrivingModeStopForVehicles, Constants.DRIVE_TO_RADIUS);
+                incoming.driver.Task.DriveTo(incoming.vehicle, incoming.destination, Constants.VEHICLE_SPEED_THRESHOLD, 
+                    VehicleDrivingFlags.DrivingModeStopForVehicles, Constants.ARRIVAL_RADIUS);
             }
 
             return new Ok<Data>(incoming);

@@ -22,7 +22,7 @@ namespace MMI_SP.Helpers.Spawn
 
          // 2. Intentar cargar el modelo
          Model model = new Model(data.ModelName);
-         bool modelLoaded = model.Request(Constants.EXTENDED_TIMEOUT_MS);
+         bool modelLoaded = model.Request(Constants.MEDIUM_TIMEOUT_MS);
 
          // 3. CASO A: Modelo cargado correctamente
          if (modelLoaded)

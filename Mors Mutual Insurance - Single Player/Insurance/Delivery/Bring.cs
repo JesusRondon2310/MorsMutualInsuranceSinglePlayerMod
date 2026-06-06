@@ -37,7 +37,7 @@ namespace MMI_SP.Insurance.Delivery
             );
 
             // Caso 3: distancia entre 200m y 600m o -> TELEPORT
-            if (distance >= Constants.TELEPORT_MIN_DISTANCE && distance < Constants.DORMANCY_THRESHOLD && !isInGarage && !isInImpound) {
+            if (distance >= Constants.MIN_DISTANCE_FOR_DELIVERY && distance < Constants.DORMANCY_THRESHOLD && !isInGarage && !isInImpound) {
                 VehicleTeleport.Execute(veh, cost, recoveredVehicle, blipsToRemove, incomingVehicles);
                 return;
             }

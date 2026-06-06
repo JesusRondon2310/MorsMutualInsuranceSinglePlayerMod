@@ -79,7 +79,7 @@ namespace MMI_SP.Helpers
         public static bool IsPositionInPoliceImpound(Vector3 position)
         {
             if (PoliceImpoundPositions.Count == 0) return false;
-            return IsWithinRadius(position, PoliceImpoundPositions[Constants.FIRST_INDEX], Constants.POLICE_IMPOUND_RADIUS);
+            return IsWithinRadius(position, PoliceImpoundPositions[Constants.FIRST_INDEX], Constants.LS_POLICE_IMPOUND_RADIUS);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace MMI_SP.Helpers.Teleport
 			if (veh == null || !veh.Exists()) return;
 
 			float currentDistance = Game.Player.Character.Position.DistanceTo(veh.Position);
-			if (currentDistance <= Constants.TELEPORT_MIN_DISTANCE) return;
+			if (currentDistance <= Constants.MIN_DISTANCE_FOR_DELIVERY) return;
 
 			Vector3 camPos = GameplayCamera.Position;
 			Vector3 camForward = GameplayCamera.Direction;

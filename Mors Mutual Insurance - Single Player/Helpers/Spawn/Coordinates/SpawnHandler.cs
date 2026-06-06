@@ -42,7 +42,7 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
          OutputArgument outHeading = new OutputArgument();
 
          bool nodeFound = Function.Call<bool>(Hash.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING, posX, posY, posZ, outPos, outHeading,
-         Constants.CLOSEST_NODE_TYPE, Constants.SEARCH_RADIUS, Constants.CLOSEST_NODE_FLAGS);
+         Constants.CLOSEST_ROAD, Constants.VALID_ROAD_SEARCH_RADIUS, Constants.GET_CLOSEST_VALID_ROAD);
 
          if (!nodeFound)
          {
@@ -62,7 +62,7 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
          if (groundHeight.is_some())
          {
             float groundZ = groundHeight.unwrap_or(Constants.GROUND_Z_FALLBACK);
-            if (Math.Abs(nodePos.Z - groundZ) < Constants.MAX_NODE_HEIGHT_DIFF)
+            if (Math.Abs(nodePos.Z - groundZ) < Constants.MAX_ROAD_HEIGHT_DIFF)
                return new Ok<Vector3>(new Vector3(nodePos.X, nodePos.Y, groundZ + Constants.GROUND_OFFSET));
          }
 
@@ -91,7 +91,7 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
 
          bool success = Function.Call<bool>(Hash.GET_NTH_CLOSEST_VEHICLE_NODE, nodePos.X, nodePos.Y, nodePos.Z,
             Constants.CLOSEST_VEHICLE_NODE_INDEX, outPos, outHeading,
-            Constants.VEHICLE_NODE_TYPE, Constants.ROAD_NODE_RADIUS, Constants.VEHICLE_NODE_FLAGS);
+            Constants.VEHICLE_NODE_TYPE, Constants.CLOSEST_ROAD_SEARCH_RADIUS, Constants.VEHICLE_NODE_FLAGS);
          if (!success) return fallbackHeading;
 
          return outHeading.GetResult<float>();

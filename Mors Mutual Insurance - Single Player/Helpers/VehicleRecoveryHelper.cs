@@ -51,7 +51,7 @@ namespace MMI_SP.Helpers
       public static void CleanDuplicatesInImpound()
       {
          Vector3 impoundCenter = VehiclesInGarage.PoliceImpoundPositions[Constants.FIRST_INDEX];
-         float radius = Constants.POLICE_IMPOUND_RADIUS;
+         float radius = Constants.LS_POLICE_IMPOUND_RADIUS;
 
          int deleted = Constants.NONE;
          var vehiclesInArea = World.GetAllVehicles()

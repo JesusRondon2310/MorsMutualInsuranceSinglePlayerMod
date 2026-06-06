@@ -14,7 +14,7 @@ namespace MMI_SP.Insurance.Policies
 
         private static int GetBaseCost(Vehicle veh)
         {
-            if (veh == null || !veh.Exists()) return 0;
+            if (veh == null || !veh.Exists()) return Constants.NONE;
 
             if (veh.Model.IsBike || veh.Model.IsBicycle) return Constants.COST_BIKE;
 
@@ -27,8 +27,7 @@ namespace MMI_SP.Insurance.Policies
 
         private static int GetBaseCost(VehicleData data)
         {
-            if (data == null)
-                return 0;
+            if (data == null) return Constants.NONE;
 
             switch (data.VehicleType)
             {
@@ -59,7 +58,7 @@ namespace MMI_SP.Insurance.Policies
                     int baseCost = GetBaseCost(data);
                     return (int)(baseCost * ModSettings.RecoverMult);
                 },
-                onNone: () => 0
+                onNone: () => Constants.NONE
             );
         }
     }

@@ -1,5 +1,4 @@
-﻿using GTA;
-using MMI_SP.PatternMatching;
+﻿using MMI_SP.PatternMatching;
 using System.Collections.Generic;
 
 namespace MMI_SP.DB
@@ -13,31 +12,22 @@ namespace MMI_SP.DB
 
         internal static Result<bool> Save() => Queries.Save();
 
-        public static Option<VehicleData> FindVehicle(string vehicleId)
-            => Queries.FindVehicle(vehicleId);
+        public static Option<VehicleData> FindVehicle(string vehicleId) => Queries.FindVehicle(vehicleId);
 
-        public static Result<bool> Add(VehicleData data)
-            => Queries.Add(data);
+        public static Result<bool> Add(VehicleData data) => Queries.Add(data);
 
-        public static Result<bool> Remove(string vehicleId)
-            => Queries.Remove(vehicleId);
+        public static Result<bool> Remove(string vehicleId) => Queries.Remove(vehicleId);
 
-        public static Result<bool> Update(VehicleData updatedData)
-            => Queries.Update(updatedData);
+        public static Result<bool> Update(VehicleData updatedData) => Queries.Update(updatedData);
 
-        public static Result<bool> SetDormant(string vehicleId, bool dormant)
-            => Queries.SetDormant(vehicleId, dormant);
+        public static Result<bool> SetDormant(string vehicleId, bool dormant) => Queries.SetDormant(vehicleId, dormant);
 
-        internal static List<VehicleData> GetAll()
-            => Queries.GetAll();
+        internal static List<VehicleData> GetAll() => Queries.GetAll();
 
-        internal static List<string> GetInsuredIds()
-            => Queries.GetInsuredIds();
+        internal static List<string> GetInsuredIds() => Queries.GetInsuredIds();
 
-        internal static List<string> GetActiveInsuredIds()
-            => Queries.GetActiveInsuredIds();
+        internal static List<string> GetActiveInsuredIds() => Queries.GetActiveInsuredIds();
 
-        internal static List<string> GetDestroyedIds()
-            => Queries.GetDestroyedIds();
+        internal static List<string> GetDestroyedIds() => Queries.GetDestroyedIds();
     }
 }

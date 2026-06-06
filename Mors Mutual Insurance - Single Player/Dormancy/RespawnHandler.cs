@@ -27,12 +27,10 @@ namespace MMI_SP.Dormancy
             Vector3 savedPos = new Vector3(dormant.Data.PosX, dormant.Data.PosY, dormant.Data.PosZ);
             float distance = Game.Player.Character.Position.DistanceTo(savedPos);
 
-            if (distance <= Constants.DORMANT_RESPAWN_DISTANCE)
-            {
+            if (distance <= Constants.MIN_DISTANCE_FOR_DELIVERY) {
                 return (savedPos, dormant.Data.Heading);
             }
-            else
-            {
+            else {
                 Vector3 behindPos = SpawnHandler.DriverDeliverySpawn(Constants.DELIVERY_DISTANCE_BEHIND_PLAYER);
                 var roadResult = SpawnHandler.GetValidRoad(behindPos.X, behindPos.Y, behindPos.Z);
                 Vector3 spawnPos = roadResult.unwrap_or(behindPos);

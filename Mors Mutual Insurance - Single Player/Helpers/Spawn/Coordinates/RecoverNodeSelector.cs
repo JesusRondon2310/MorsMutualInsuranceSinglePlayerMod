@@ -44,7 +44,7 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
             }
 
             EntityPosition clearSpawn = MMIWarehouse.SpawnListVehicle[_random.Next(0, MMIWarehouse.SpawnListVehicle.Count)];
-            Function.Call(Hash.CLEAR_AREA_OF_VEHICLES, clearSpawn.Position.X, clearSpawn.Position.Y, clearSpawn.Position.Z, Constants.CLEAR_AREA_RADIUS,
+            Function.Call(Hash.CLEAR_AREA_OF_VEHICLES, clearSpawn.Position.X, clearSpawn.Position.Y, clearSpawn.Position.Z, Constants.VEHICLE_STOP_MIN_SPEED,
                 false, false, false, false, false);
             return new Ok<EntityPosition>(clearSpawn);
         }

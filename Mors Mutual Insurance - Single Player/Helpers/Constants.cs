@@ -6,79 +6,7 @@ namespace MMI_SP.Helpers
    public static class Constants
    {
       // ==========================================
-      // BLOQUE: Spawn / Coordenadas
-      // ==========================================
-      public const float GROUND_OFFSET = 0.5f;
-      public const float MAX_NODE_HEIGHT_DIFF = 3.0f;
-      public const float MAX_NODE_SEARCH_DISTANCE = 60f;
-      public const float SEARCH_RADIUS = 30.0f; // radio de búsqueda 
-      public const int CLOSEST_NODE_TYPE = 1; // carretera normal
-      public const int CLOSEST_NODE_FLAGS = 1 | 2 | 4; // excluye trenes, contraflujo y autopistas 
-      public const float DORMANT_RESPAWN_DISTANCE = 200f;
-      public const float ROAD_NODE_RADIUS = 3.0f;
-
-      // ==========================================
-      // BLOQUE: Nodos de recuperación (RecoverNodeSelector / MMIWarehouse)
-      // ==========================================
-      public const float DISTANCE_IN_FRONT_OF_PLAYER = 5.0f;
-      public const float CLEAR_AREA_RADIUS = 1.0f;
-      public const float VEHICLE_LONG_THRESHOLD = 7.4f;
-
-      // ==========================================
-      // BLOQUE: Entregas / Mecánico
-      // ==========================================
-      public const float TELEPORT_MIN_DISTANCE = 200f;
-      public const float DELIVERY_DISTANCE_BEHIND_PLAYER = 150f;
-      public const float DELIVERY_COMPLETION_RADIUS = 80f;
-      public const float TOO_CLOSE_DISTANCE = 40f;   // Distancia mínima para considerar vehículo demasiado cerca
-      public const float DRIVE_TO_SPEED = 10.0f;          // Velocidad de conducción del mecánico (m/s)
-      public const float DRIVE_TO_RADIUS = 20.0f;         // Radio de seguimiento de ruta
-      public const int MIN_ARRIVAL_TIME_AFTER_START_MS = 10000; // Tiempo mínimo antes de permitir bajarse
-      public const float ARRIVAL_PRECISION_DIST = 15.0f;   // distancia horizontal para considerar llegada
-      public const float ARRIVAL_PRECISION_ALT = 2.0f;    // diferencia de altura para considerar llegada
-      public const int MINUTE_MS = 60000;                 // milisegundos en un minuto
-      public const float ARRIVAL_DISTANCE = 35.0f;
-      public const float ARRIVAL_SPEED_THRESHOLD = 3.0f;
-      public const int TELEPORT_FREEZE_MS = 250;
-
-      // ==========================================
-      // BLOQUE: Límites del sistema / Detección
-      // ==========================================
-      public const int MAX_INSURED_VEHICLES = 30;
-      public const int MAX_CLAIMABLE_VEHICLES = 5;
-      public const float DORMANCY_THRESHOLD = 600f;
-      public const float MIN_VALID_POSITION_LENGTH = 1f;
-
-      // ==========================================
-      // BLOQUE: Tiempos de espera genéricos
-      // ==========================================
-      public const int SHORT_TIMEOUT_MS = 1500;
-      public const int EXTENDED_TIMEOUT_MS = 2000;
-      public const int LONG_TIMEOUT_MS = 3000;
-
-      // ==========================================
-      // BLOQUE: Restauración de vehículos
-      // ==========================================
-      public const float GARAGE_SEARCH_RADIUS = 30f;
-
-      // ==========================================
-      // BLOQUE: Teletransporte
-      // ==========================================
-      public const float MAX_HEADING_DIFF_DEGREES = 45f;
-      public const float HALF_CIRCLE_DEGREES = 180f;
-      public const float FULL_CIRCLE_DEGREES = 360f;
-
-      // ==========================================
-      // BLOQUE: Notificaciones (iconType)
-      // ==========================================
-      public const int NOTIFY_ICON_MESSAGE = 1;
-      public const int NOTIFY_ICON_MAIL = 2;
-      public const int NOTIFY_ICON_CONTACT_ADDED = 3;
-      public const int NOTIFY_ICON_NONE = 4;
-      public const int NOTIFY_NO_HIERARCHY = 0;
-
-      // ==========================================
-      // BLOQUE: Valores numéricos genéricos
+      // BLOQUE: Tiempos de espera y Valores numéricos genéricos
       // ==========================================
       public const int NONE = 0;           // Para comparaciones de cantidad (0 elementos)
       public const int FIRST_INDEX = 0;    // Para acceder al primer elemento de una lista
@@ -89,21 +17,24 @@ namespace MMI_SP.Helpers
       public const int VEHICLE_NODE_FLAGS = 0;           // Sin flags especiales
       public const float DEFAULT_HEADING = 0f;           // Orientación por defecto
       public const float GROUND_Z_FALLBACK = 0f;         // Altura de suelo por defecto (fallback)
+      public const int SHORT_TIMEOUT_MS = 1500;
+      public const int MEDIUM_TIMEOUT_MS = 2000;
+      public const int LONG_TIMEOUT_MS = 3000;
 
       // ==========================================
-      // BLOQUE: Garajes y depósitos
-      // ==========================================
-      public const float INTERIOR_GARAGE_RADIUS = 20f;
-      public const float POLICE_IMPOUND_RADIUS = 11f;
-
-      // ==========================================
-      // BLOQUE: Seguros (Insurance / Policies)
+      // BLOQUE: Costes de Seguros
       // ==========================================
       public const int COST_BIKE = 1350;        // 1.350 GTA$
       public const int COST_TANK = 50000;       // 50.000 GTA$
       public const int COST_MILITARY = 17000;   // 17.000 GTA$
       public const int COST_CAR_DEFAULT = 5000; // 5.000 GTA$
       public const float RECOVER_PERCENT = 0.25f; // 25% para el deducible
+
+      // ==========================================
+      // BLOQUE: Límites del Mod
+      // ==========================================
+      public const int MAX_INSURED_VEHICLES = 30;
+      public const int MAX_CLAIMABLE_VEHICLES = 5;
 
       // ==========================================
       // BLOQUE: Bloqueo de vehículos (LockVehicle)
@@ -115,6 +46,61 @@ namespace MMI_SP.Helpers
       public const int LOCK_LIGHTS_MODE_OFF = 0;
       public const int LOCK_LIGHTS_MODE_NORMAL = 1;
       public const int LOCK_LIGHTS_MODE_HAZARD = 2;
+      public const float LOCK_MAX_DISTANCE = 2.5f;
+
+      // ==========================================
+      // BLOQUE: Dormancia
+      // ==========================================
+      public const float DORMANCY_THRESHOLD = 600f;
+      public const float MIN_VALID_POSITION_LENGTH = 1f;
+
+      // ==========================================
+      // BLOQUE: Entregas / Spawn / Coordenadas / Teleport
+      // ==========================================
+      public const float MIN_DISTANCE_FOR_DELIVERY = 200f;
+      public const float DELIVERY_DISTANCE_BEHIND_PLAYER = 150f;
+      public const float MAX_ROAD_HEIGHT_DIFF = 3.0f;
+      public const int CLOSEST_ROAD = 1; // carretera normal
+      public const int GET_CLOSEST_VALID_ROAD = 1 | 2 | 4; // excluye trenes, contraflujo y autopistas 
+      public const float VALID_ROAD_SEARCH_RADIUS = 30.0f; // radio de búsqueda 
+      public const float TOO_CLOSE_DISTANCE = 40f;   // Distancia mínima para considerar vehículo demasiado cerca
+      public const float CLOSEST_ROAD_SEARCH_RADIUS = 3.0f;
+      public const float GROUND_OFFSET = 0.5f;
+      public const float VEHICLE_STOP_SPEED = 0f;
+      public const float VEHICLE_SPEED_THRESHOLD = 10.0f;          // Velocidad de conducción del mecánico (m/s)
+      public const float ARRIVAL_PRECISION_DIST = 15.0f;   // distancia horizontal para considerar llegada
+      public const float ARRIVAL_PRECISION_ALT = 2.0f;    // diferencia de altura para considerar llegada
+      public const float ARRIVAL_DISTANCE = 35.0f;
+      public const float ARRIVAL_MINIMUN_SPEED  = 3.0f;
+      public const float ARRIVAL_RADIUS = 20.0f;         // Radio de seguimiento de ruta
+      public const int TELEPORT_FREEZE_MS = 250;
+      public const int MINUTE_MS = 60000;  // milisegundos en un minuto
+
+      // ==========================================
+      // BLOQUE: Modificaciones de vehículos (VehicleDataBuilder.cs)
+      // ==========================================
+      public const int MAX_VEHICLE_MOD_TYPE = 49;      // Tipos de mod (0..48)
+      public const int TURBO_MOD_INDEX = 18;           // Índice del turbo en Mods
+      public const int XENON_MOD_INDEX = 22;           // Índice de luces de xenón
+      public const int VARIATION_MOD_10 = 10;          // Mod de variación 10
+      public const int CUSTOM_TIRES_MOD_INDEX = 23;    // Índice de neumáticos personalizados
+      public const int NO_MOD = -1;                    // Valor cuando una modificación no está instalada
+      public const int NO_COLOR = -1;                  // Valor cuando no hay color (ej. neón apagado)
+      public const int MOD_INSTALLED = 1;              // Valor cuando un mod toggle está activado
+      public const float GARAGE_SEARCH_RADIUS = 30f;
+
+      // ==========================================
+      // BLOQUE: RecoverNodeSelector / MMIWarehouse
+      // ==========================================
+      public const float DISTANCE_IN_FRONT_OF_PLAYER = 5.0f;
+      public const float VEHICLE_STOP_MIN_SPEED = 1.0f;
+      public const float VEHICLE_LONG_THRESHOLD = 7.4f;
+
+      // ==========================================
+      // BLOQUE: Garajes y depósitos
+      // ==========================================
+      public const float INTERIOR_GARAGE_RADIUS = 20f;
+      public const float LS_POLICE_IMPOUND_RADIUS = 11f;
 
       // ==========================================
       // BLOQUE: Claves de recuperación (KeyManager)
@@ -123,7 +109,7 @@ namespace MMI_SP.Helpers
       public const int RECOVERY_KEY_PARTS = 3;   // número esperado de partes: Model, Plate, Id
 
       // ==========================================
-      // BLOQUE: Placas problemáticas
+      // BLOQUE: Placa problemática
       // ==========================================
       public const string PROBLEMATIC_PLATE = "46EEK572";
 
@@ -143,25 +129,13 @@ namespace MMI_SP.Helpers
       public static readonly Color NOT_INSURED_COLOR = Color.FromArgb(190, 0, 50); // Rojo
 
       // ==========================================
-      // BLOQUE: Bloqueo de vehículos (LockVehicle)
+      // BLOQUE: Configuración del menú y Notificaciones(iFruit)
       // ==========================================
-      public const float LOCK_MAX_DISTANCE = 2.5f;
-
-      // ==========================================
-      // BLOQUE: Modificaciones de vehículos (VehicleDataBuilder)
-      // ==========================================
-      public const int MAX_VEHICLE_MOD_TYPE = 49;      // Tipos de mod (0..48)
-      public const int TURBO_MOD_INDEX = 18;           // Índice del turbo en Mods
-      public const int XENON_MOD_INDEX = 22;           // Índice de luces de xenón
-      public const int VARIATION_MOD_10 = 10;          // Mod de variación 10
-      public const int CUSTOM_TIRES_MOD_INDEX = 23;    // Índice de neumáticos personalizados
-      public const int NO_MOD = -1;                    // Valor cuando una modificación no está instalada
-      public const int NO_COLOR = -1;                  // Valor cuando no hay color (ej. neón apagado)
-      public const int MOD_INSTALLED = 1;              // Valor cuando un mod toggle está activado
-
-      // ==========================================
-      // BLOQUE: Configuración del menú (iFruit)
-      // ==========================================
+      public const int NOTIFY_ICON_MESSAGE = 1; // Icono de mensaje
+      public const int NOTIFY_ICON_MAIL = 2; // Icono de mail
+      public const int NOTIFY_ICON_CONTACT_ADDED = 3; // Icono de contacto añadido
+      public const int NOTIFY_ICON_NONE = 4; // sin icono
+      public const int NOTIFY_NO_HIERARCHY = 0; // sin jerarquía de texto
       public const int PHONE_VOLUME_MIN = 0;
       public const int PHONE_VOLUME_MAX = 100;
       public const int PHONE_VOLUME_STEP = 5;
@@ -180,9 +154,7 @@ namespace MMI_SP.Helpers
       public const float FLOAT_EPSILON = 0.001f;   // Tolerancia para comparación de floats
       public const int ROUND_DECIMALS = 1;         // Número de decimales para redondeo
 
-      // ==========================================
-      // BLOQUE: Bromas del mecánico (iFruit)
-      // ==========================================
+      // Bromas del mecánico (iFruit)
       public static readonly string[] CURRENT_VEHICLE_JOKES = new string[]
       {
             "Te reto a presionar el boton. No hay huevos.",

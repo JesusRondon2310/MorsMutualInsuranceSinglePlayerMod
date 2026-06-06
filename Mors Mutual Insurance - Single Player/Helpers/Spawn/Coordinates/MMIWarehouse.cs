@@ -96,7 +96,7 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
             // Si no hay ningún punto libre, limpiamos uno aleatorio de la lista genérica
             EntityPosition clearSpawn = SpawnListVehicle[_random.Next(0, SpawnListVehicle.Count)];
             Function.Call(Hash.CLEAR_AREA_OF_VEHICLES, clearSpawn.Position.X, clearSpawn.Position.Y, clearSpawn.Position.Z,
-                Constants.CLEAR_AREA_RADIUS, false, false, false, false, false);
+                Constants.VEHICLE_STOP_MIN_SPEED, false, false, false, false, false);
             return new Ok<EntityPosition>(clearSpawn);
         }
     }
