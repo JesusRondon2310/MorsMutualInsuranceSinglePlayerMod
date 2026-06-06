@@ -1,0 +1,10 @@
+# Ignorar carpetas generadas por Visual Studio y VS Code
+Mors Mutual Insurance - Single Player/.vs/
+Mors Mutual Insurance - Single Player/.vscode/
+Mors Mutual Insurance - Single Player/obj/
+Mors Mutual Insurance - Single Player/bin/
+Mors Mutual Insurance - Single Player/_Other/
+
+# Opcional: Ignorar archivos de usuario específicos de VS
+*.user
+*.suo
