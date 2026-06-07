@@ -50,16 +50,16 @@ namespace MMI_SP.Insurance.Policies
             return (int)(GetBaseCost(veh) * ModSettings.InsuranceMult);
         }
 
-        internal static int GetRecoverCost(string vehicleId)
-        {
-            return DB.Core.FindVehicle(vehicleId).match<int>(
-                onSome: data =>
-                {
-                    int baseCost = GetBaseCost(data);
-                    return (int)(baseCost * ModSettings.RecoverMult);
-                },
-                onNone: () => Constants.NONE
-            );
-        }
-    }
+      internal static int GetRecoverCost(string vehicleId)
+      {
+         return DB.Core.FindVehicle(vehicleId).match<int>(
+             onSome: data => {
+                int baseCost = GetBaseCost(data);
+                // Aplicar deducible del 25% y luego multiplicador de configuración
+                return (int)(baseCost * Constants.RECOVER_PERCENT * ModSettings.RecoverMult);
+             },
+             onNone: () => Constants.NONE
+         );
+      }
+   }
 }

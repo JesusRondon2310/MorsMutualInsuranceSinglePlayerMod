@@ -9,6 +9,9 @@ namespace MMI_SP.Insurance.Delivery
 {
     internal static class Completion
     {
+        // ==========================================
+        // BLOQUE: Funciones
+        // ==========================================
         internal static void ForceIfNear(List<Data> incomingVehicles)
         {
             for (int i = incomingVehicles.Count - 1; i >= 0; i--)
@@ -30,7 +33,6 @@ namespace MMI_SP.Insurance.Delivery
                 float distance = t.vehicle.Position.DistanceTo(t.destination);
                 if (distance <= Constants.ARRIVAL_DISTANCE && t.vehicle.Speed < Constants.ARRIVAL_MINIMUN_SPEED)
                 {
-                    // Frenar el vehículo para evitar inercia (mejora añadida, no estaba en original pero ayuda)
                     t.vehicle.Velocity = Vector3.Zero;
                     t.vehicle.WorldRotationVelocity = Vector3.Zero;
                     Function.Call(Hash.SET_VEHICLE_FORWARD_SPEED, t.vehicle, Constants.VEHICLE_STOP_SPEED);
@@ -56,7 +58,8 @@ namespace MMI_SP.Insurance.Delivery
             Refund(incoming, refund);
             incoming.driver.Delete();
             RepairIfAlive(incoming);
-            incomingVehicles.Remove(incoming);
+            // ELIMINADO: incomingVehicles.Remove(incoming);
+            // La gestión de la lista es responsabilidad exclusiva del llamador (TrackVehicleState)
         }
 
         private static void NotifyFailure() => Notification.ShowMechanic("Información", "No se pudo traer el vehículo.");

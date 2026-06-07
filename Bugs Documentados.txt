@@ -1,19 +1,40 @@
 ================================================================================
-MMI-SP REWRITE — REGISTRO UNIFICADO DE BUGS CORREGIDOS
+Mors Mutual Insurance - Single Player MOD — REGISTRO DE BUGS CORREGIDOS
 ================================================================================
-Total: 27 bugs
+Última actualización: 2026-06-07
+Total de bugs (tras fusionar duplicados): 34
+
+================================================================================
+ÍNDICE POR SECCIONES
+================================================================================
+1.  Persistencia y estado del vehículo .......... BUG 1,2,3,4,5,7,9,10,11,12,13,19,20,25,26,29
+2.  Entregas del mecánico ...................... BUG 16,17,31,32,33,34
+3.  Garajes ..................................... BUG 20,21,22,28
+4.  Modificaciones y accesorios ................. BUG 1,10,11,12,13
+5.  UI, notificaciones y blips .................. BUG 6,14,15,23
+6.  Otros (addons, limpieza, cancelación) ....... BUG 18,27,28,30
+================================================================================
 
 ================================================================================
 BUG 1 — Mods de LSC no se guardan
+================================================================================
+SÍNTOMA:
+  Al salir del taller de Los Santos Customs, las modificaciones aplicadas
+  (motor, frenos, color, etc.) se pierden y el vehículo vuelve a su estado anterior.
 CAUSA:
   HandleAliveVehicle en VehicleMonitor tenía la condición GameplayCamera.IsRendering.
-  Dentro de LSC la cámara no renderiza, por lo que el update nunca se ejecutaba.
+  Dentro de LSC la cámara del juego no renderiza (usa su propia cámara),
+  por lo que el update nunca se ejecutaba.
 SOLUCIÓN:
   Eliminar GameplayCamera.IsRendering de HandleAliveVehicle.
 ARCHIVO: Insurance/Observer/VehicleMonitor.cs
 
 ================================================================================
 BUG 2 — Posición del vehículo no se guarda al aparcar
+================================================================================
+SÍNTOMA:
+  Al bajarse del vehículo en una ubicación y recargar la partida, el coche
+  aparece en una posición anterior (a menudo en la última carretera donde se condujo).
 CAUSA:
   UpdateVehicleData solo se ejecutaba mientras el jugador conducía.
   Al bajarse, la posición no se guardaba.
@@ -23,63 +44,88 @@ SOLUCIÓN:
 ARCHIVO: Insurance/Observer/VehicleChangeHandler.cs
 
 ================================================================================
-BUG 3 — IsDestroyed queda en false tras destruir vehículo
+BUG 3 — IsDestroyed false tras destruir vehículo + pintura incorrecta al recuperarlo
+================================================================================
+(Nota: fusiona los antiguos BUG 3 y BUG 8)
+SÍNTOMA:
+  - El vehículo explota y se muestra el mensaje de Mors Mutual, pero en la base de datos
+    IsDestroyed permanece false.
+  - Al recuperar el coche, aparece con los colores quemados/dañados del momento de la
+    destrucción, no con los originales.
 CAUSA:
-  En DestroyedVehicle.Handle se ejecutaba MarkAsDestroyed y luego
-  UpdateVehicleData, que sobrescribía el flag.
+  En DestroyedVehicle.Handle se ejecutaba MarkAsDestroyed (pone IsDestroyed = true)
+  y luego UpdateVehicleData, que sobrescribía el flag con false y guardaba los colores
+  del vehículo ya destruido.
 SOLUCIÓN:
-  Eliminar UpdateVehicleData de DestroyedVehicle.Handle.
+  Eliminar completamente la llamada a UpdateVehicleData dentro de DestroyedVehicle.Handle.
 ARCHIVO: Insurance/Observer/DestroyedVehicle.cs
 
 ================================================================================
 BUG 4 — Vehículos dormantes al entrar a interior (Vector3.Zero insuficiente)
+================================================================================
+SÍNTOMA:
+  Al entrar a un interior (oficina MMI, garaje comprado, etc.), el vehículo se marca
+  como dormante y desaparece del mundo; al salir no reaparece.
 CAUSA:
-  Al entrar a un interior, el vehículo puede tener posición válida pero lejana,
-  o Vector3.Zero en un frame. La distancia enorme activaba el despawn.
+  Durante la transición, el vehículo puede tener posición Vector3.Zero o coordenadas
+  de interior válidas pero lejanas. La distancia calculada supera 600 m y se activa
+  el despawn.
 SOLUCIÓN COMPLETA:
-  1. En HandleExterior: guards de interior y posición inválida.
-  2. En DespawnHandler.Execute: verificar posición inválida y distancia <600m.
-  3. Usar GET_INTERIOR_FROM_ENTITY para detectar interiores.
+  1. En HandleExterior: guards de IsPlayerInsideAnyInterior() y currentVeh.Position == Vector3.Zero.
+  2. En DespawnHandler.Execute: verificar posición inválida y distancia < 600 m.
+  3. Usar GET_INTERIOR_FROM_ENTITY para detectar interiores de forma robusta.
 ARCHIVOS: Insurance/Observer/AliveVehicleDespawn.cs, Dormancy/DespawnHandler.cs
 
 ================================================================================
 BUG 5 — Duplicados tras recuperar del lote policial
+================================================================================
+SÍNTOMA:
+  Al recuperar un vehículo del depósito policial, aparecen dos copias idénticas del
+  mismo coche (una en el depósito y otra en el mundo, o dos en la lista asegurada).
 CAUSA:
-  Al recuperar un vehículo del depósito, el Observer lo detectaba como nuevo
-  y lo añadía de nuevo, generando duplicado.
+  Al recuperar del lote, el Observer detectaba el vehículo como desaparecido y lo
+  eliminaba de insuredVehList. Al restaurarlo, CheckForInsuredVehicles lo detectaba
+  como nuevo y lo añadía de nuevo, generando duplicado.
 SOLUCIÓN:
   En CheckForInsuredVehicles, verificar si ya existe un vehículo con el mismo ID
   antes de añadirlo a insuredVehList.
 ARCHIVO: Insurance/Observer/VehicleMonitor.cs
 
 ================================================================================
-BUG 6 — Vehículos fantasma tras cancelar póliza
+BUG 6 — Vehículos fantasma tras cancelar póliza (fusiona BUG 6 y BUG 24)
+================================================================================
+SÍNTOMA:
+  Después de cancelar la póliza de un vehículo, el coche sigue apareciendo en el
+  menú del mecánico y en la lista de vehículos asegurados (fantasma), aunque ya no
+  debería estar asegurado.
 CAUSA:
-  RemoveVehicleObservation llamaba a DB.Core.FindVehicle DESPUÉS de que
-  Manager.Cancel ya había eliminado el vehículo de la DB.
+  RemoveVehicleObservation llamaba a DB.Core.FindVehicle DESPUÉS de que Manager.Cancel
+  ya había eliminado el vehículo de la DB. La clave del vehículo se perdía y nunca
+  se limpiaban las listas DormantVehicles ni RecoveredVehicleKeys.
 SOLUCIÓN:
-  En CancelHandler, obtener VehicleData ANTES de cancelar y pasar la clave
-  a RemoveVehicleObservation.
+  En CancelHandler, obtener VehicleData ANTES de cancelar y pasar la clave ya calculada
+  a RemoveVehicleObservation como parámetro adicional.
 ARCHIVO: Agency/MainMenu/SubMenus/CancelHandler.cs
 
 ================================================================================
 BUG 7 — Dormantes no aparecen al cargar partida
+================================================================================
+SÍNTOMA:
+  Al cargar una partida guardada, los vehículos que estaban dormantes (a más de 600 m)
+  no aparecían en el menú del mecánico ni se podían recuperar.
 CAUSA:
-  Initializer ignoraba los vehículos con IsDormant = true.
+  Initializer ignoraba los vehículos con IsDormant = true (continue).
 SOLUCIÓN:
-  Cuando data.IsDormant == true, añadir a Dormancy.Core.DormantVehicles.
+  Cuando data.IsDormant == true, añadir a Dormancy.Core.DormantVehicles en lugar de
+  saltarlos.
 ARCHIVO: Insurance/Observer/Initializer.cs
 
 ================================================================================
-BUG 8 — Pintura incorrecta al recuperar vehículo destruido
-CAUSA:
-  Mismo origen que BUG 3: UpdateVehicleData guardaba colores del vehículo muerto.
-SOLUCIÓN:
-  Eliminar UpdateVehicleData de DestroyedVehicle.Handle.
-ARCHIVO: Insurance/Observer/DestroyedVehicle.cs
-
-================================================================================
 BUG 9 — IsDestroyed: true + IsInGarage: true simultáneamente
+================================================================================
+SÍNTOMA:
+  En la base de datos aparecen vehículos con IsDestroyed = true y al mismo tiempo
+  IsInGarage = true, lo que causa inconsistencias en la lógica de restauración.
 CAUSA:
   MarkAsDestroyed preservaba IsInGarage del registro original.
 SOLUCIÓN:
@@ -88,8 +134,13 @@ ARCHIVO: Insurance/Policies/InsurerOperations.cs
 
 ================================================================================
 BUG 10 — Llantas antibalas no se guardan (clave 999)
+================================================================================
+SÍNTOMA:
+  Al personalizar un vehículo con llantas antibalas, tras guardar y cargar la partida
+  la propiedad se pierde (las llantas vuelven a ser normales).
 CAUSA:
-  Se guardaban como mods[999] en el mismo Dictionary que los mods reales.
+  Se guardaban como mods[999] en el mismo Dictionary que los mods reales. La clave 999
+  es arbitraria y frágil.
 SOLUCIÓN:
   Añadir campo BulletproofTires (bool) a VehicleData.
   Capturar con GET_VEHICLE_TYRES_CAN_BURST y restaurar con SET_VEHICLE_TYRES_CAN_BURST.
@@ -97,48 +148,72 @@ ARCHIVOS: DB/VehicleData.cs, DB/VehicleDataBuilder.cs, DB/VehicleSpawnManager.cs
 
 ================================================================================
 BUG 11 — Humo de neumáticos no se restaura (TireSmoke)
+================================================================================
+SÍNTOMA:
+  El humo de neumáticos personalizado (color) desaparece tras guardar y cargar.
 CAUSA:
   Se usaba SET_VEHICLE_MOD con mod 20, que no activa el humo en SHVDN3.
 SOLUCIÓN:
-  Usar veh.Mods[VehicleToggleModType.TireSmoke].IsInstalled = true.
+  Usar veh.Mods[VehicleToggleModType.TireSmoke].IsInstalled = true;
+  y SET_VEHICLE_TYRE_SMOKE_COLOR para el color.
 ARCHIVO: DB/VehicleSpawnManager.cs
 
 ================================================================================
 BUG 12 — Llantas antibalas se resetean tras UpdateVehicleData
+================================================================================
+SÍNTOMA:
+  Las llantas antibalas funcionaban justo después de spawnear, pero tras un tiempo
+  (o tras ciertas actualizaciones) se desactivaban solas.
 CAUSA:
-  UpdateVehicleData preservaba existing.BulletproofTires en vez de leer del vivo.
-  InstallModKit reseteaba la propiedad.
+  UpdateVehicleData preservaba existing.BulletproofTires en vez de leer del vehículo vivo.
+  Además, InstallModKit reseteaba la propiedad.
 SOLUCIÓN:
-  Usar updated.BulletproofTires. Restaurar al final del spawn.
+  Usar updated.BulletproofTires. Restaurar al final del spawn, después de todos los mods.
 ARCHIVOS: Insurance/Policies/InsurerOperations.cs, DB/VehicleSpawnManager.cs
 
 ================================================================================
 BUG 13 — Neón no se restaura al spawnear
+================================================================================
+SÍNTOMA:
+  Las luces de neón personalizadas desaparecen al guardar y cargar el vehículo.
 CAUSA:
   Orden de restauración incorrecto. UpdateVehicleData preservaba valores del existing.
 SOLUCIÓN:
-  1. En UpdateVehicleData usar updated.NeonLeft, updated.NeonColor.
-  2. En SpawnVehicle restaurar neón al final, después de todo.
+  1. En UpdateVehicleData usar updated.NeonLeft, updated.NeonColor, etc.
+  2. En SpawnVehicle restaurar neón al final, después de todo (humo, llantas, etc.).
 ARCHIVOS: Insurance/Policies/InsurerOperations.cs, DB/VehicleSpawnManager.cs
 
 ================================================================================
 BUG 14 — Blips no desaparecen al subirse al vehículo
+================================================================================
+SÍNTOMA:
+  El blip del vehículo asegurado en el mapa permanece visible incluso después de que
+  el jugador se sube al coche.
 CAUSA:
-  Inconsistencia de claves entre VehicleKey.FullKeyFrom y vehId.
+  Inconsistencia de claves entre VehicleKey.FullKeyFrom y vehId. El diccionario de
+  blips usaba un formato y la búsqueda de eliminación otro.
 SOLUCIÓN:
   Unificar el formato de clave en todo el sistema usando VehicleKey.FullKeyFrom.
 ARCHIVOS: Insurance/Observer/VehicleMonitor.cs, Helpers/Blips/BlipCleanupHandler.cs
 
 ================================================================================
 BUG 15 — Notificaciones MMI sin jerarquía h4+h1+p
+================================================================================
+SÍNTOMA:
+  Las notificaciones de Mors Mutual aparecen con todo el texto en el mismo nivel
+  (sin remitente, asunto y cuerpo diferenciados).
 CAUSA:
-  Se usaba PostMessageText que mete todo en h1.
+  Se usaba GTA.UI.Notification.PostMessageText que mete todo en h1.
 SOLUCIÓN:
   Usar el native directamente con iconType = 2 para activar la jerarquía.
 ARCHIVO: Helpers/Notification.cs
 
 ================================================================================
 BUG 16 — Mecánico mata al NPC al spawnear encima del vehículo
+================================================================================
+SÍNTOMA:
+  Cuando el mecánico aparece para entregar un vehículo, el NPC (conductor) nace dentro
+  o encima del coche, recibe daño y a veces muere, bloqueando la entrega.
 CAUSA:
   El mecánico se spawnaba exactamente en veh.Position.
 SOLUCIÓN:
@@ -147,41 +222,68 @@ ARCHIVO: Insurance/Observer/Delivery/Tracking.cs
 
 ================================================================================
 BUG 17 — Mecánico no se baja del coche al llegar
+================================================================================
+SÍNTOMA:
+  El vehículo llega junto al jugador, pero el conductor se queda sentado dentro sin
+  bajarse, y el coche no se entrega.
 CAUSA:
-  Condiciones de distancia y timer insuficientes.
+  Condiciones de distancia y timer insuficientes. HasDriverArrived requería
+  IsInVehicle = true pero la distancia exacta no siempre se cumplía.
 SOLUCIÓN:
-  Aumentar radio a 80m, timer a 3000ms, añadir condición isStopped (Speed <= 1.0f).
+  Aumentar radio a 80m, timer a 3000ms, añadir condición isStopped (Speed <= 1.0f)
+  y extraer ForceLeaveVehicle como método compartido.
 ARCHIVO: Insurance/Observer/Delivery/UpdateIncomingHandler.cs
 
 ================================================================================
 BUG 18 — Vehículos addon hacen despawn en misiones y se duplican
+================================================================================
+SÍNTOMA:
+  Durante una misión, los vehículos addon (no nativos) desaparecen y luego reaparecen
+  duplicados al terminar la misión.
 CAUSA:
   HandleMissingVehicle eliminaba el vehículo de insuredVehList durante misiones.
+  Al terminar, CheckForInsuredVehicles lo detectaba como nuevo y lo añadía de nuevo.
 SOLUCIÓN:
-  Solo eliminar de insuredVehList si IsDestroyed o IsDormant está en true.
+  Solo eliminar de insuredVehList si IsDestroyed o IsDormant está en true en la DB.
 ARCHIVO: Insurance/Observer/VehicleMonitor.cs
 
 ================================================================================
 BUG 19 — Vehículos bloqueados a <200m se pierden al cargar partida
+================================================================================
+SÍNTOMA:
+  Si un vehículo asegurado está aparcado a menos de 200 m del jugador al guardar,
+  al cargar la partida el coche no aparece.
 CAUSA:
-  Initializer tenía branch específico para <200m que no spawneaba el vehículo.
+  Initializer tenía un branch específico para distancia <200m que no spawneaba el
+  vehículo, confiando en que el motor lo cargaría solo. Pero a veces no lo hacía.
 SOLUCIÓN:
-  Eliminar distinción. Si no se encuentra en el mundo, spawnear siempre si <600m.
+  Eliminar la distinción. Si no se encuentra en el mundo, spawnear siempre si <600m.
 ARCHIVO: Insurance/Observer/Initializer.cs
 
 ================================================================================
 BUG 20 — Vehículos en garaje desaparecen al guardar desde cama
+================================================================================
+SÍNTOMA:
+  Al guardar la partida durmiendo en la cama, los vehículos que están dentro de
+  garajes (nativos o interiores) desaparecen al recargar.
 CAUSA:
-  Comportamiento nativo de GTA V. Los garajes interiores no se gestionaban bien.
+  Comportamiento nativo de GTA V: al guardar desde cama se resetea el mundo y se
+  eliminan vehículos no persistentes. Los garajes interiores no se gestionaban bien.
 SOLUCIÓN:
-  En Initializer, saltar los vehículos con IsInGarage = true (se restauran bajo demanda).
-  En Garage.Entry, actualizar IsInGarage = true antes de llamar a RestoreIfNeeded.
+  En Initializer, saltar los vehículos con IsInGarage = true (se restauran bajo demanda
+  cuando el jugador entra al garaje). En Garage.Entry, actualizar IsInGarage = true
+  antes de llamar a RestoreIfNeeded.
 ARCHIVOS: Insurance/Observer/Initializer.cs, Insurance/Observer/Garage.cs
 
 ================================================================================
 BUG 21 — IsInGarage no se actualiza a true al entrar al garaje interior
+================================================================================
+SÍNTOMA:
+  Al entrar a un garaje interior comprado con el vehículo, el flag IsInGarage sigue
+  siendo false en la base de datos, lo que causa problemas al recargar.
 CAUSA:
-  En Garage.Entry, el branch de interiores hacía return antes de actualizar el flag.
+  En Garage.Entry, el branch para garajes interiores llamaba a RestoreIfNeeded y hacía
+  return antes de ejecutar el bloque que pone IsInGarage = true.
 SOLUCIÓN:
   Actualizar IsInGarage = true en la BD ANTES de cualquier branch.
   Pasar updatedData (con IsInGarage = true) a RestoreIfNeeded.
@@ -189,54 +291,311 @@ ARCHIVO: Insurance/Observer/Garage.cs
 
 ================================================================================
 BUG 22 — Respawn duplicado al bajarse del vehículo en garaje interior
+================================================================================
+SÍNTOMA:
+  Al bajarse del coche dentro de un garaje interior, el vehículo se duplica
+  (aparece otro igual al lado).
 CAUSA:
-  Al bajarse, el vehículo aparcado seguía en insuredVehList y se volvía a procesar.
+  Al bajarse, CurrentVehicle es null pero el vehículo aparcado sigue en insuredVehList.
+  Garage.Entry detecta que está en garaje y llama a RestoreIfNeeded, que al no encontrar
+  el vehículo del jugador, lo spawnea como "otro vehículo".
 SOLUCIÓN:
-  En Garage.Entry, verificar si currentVeh == CurrentVehicle.
+  En Garage.Entry, verificar si currentVeh == Game.Player.Character.CurrentVehicle.
   Si no, solo limpiar (no llamar a RestoreIfNeeded).
 ARCHIVO: Insurance/Observer/Garage.cs
 
 ================================================================================
 BUG 23 — Duplicados en menú mecánico a >600m
+================================================================================
+SÍNTOMA:
+  En el menú del mecánico (iFruit), aparecen dos entradas del mismo vehículo cuando
+  está dormante (distancia >600m).
 CAUSA:
-  DormantVehicles no deduplicaba. FillBring mostraba vivos y dormantes juntos.
+  DormantVehicles no deduplicaba. FillBring mostraba vehículos vivos y dormantes juntos.
 SOLUCIÓN:
   En FillBring, construir HashSet de IDs vivos y saltar dormantes cuyo ID ya esté.
   En DespawnHandler, evitar añadir dormantes duplicados.
 ARCHIVOS: iFruit/MechanicMenuBuilder.cs, Dormancy/DespawnHandler.cs
 
 ================================================================================
-BUG 24 — CancelHandler: vehículo fantasma persiste en menú mecánico
-CAUSA:
-  Mismo origen que BUG 6.
-SOLUCIÓN:
-  Ver BUG 6.
-ARCHIVO: Agency/MainMenu/SubMenus/CancelHandler.cs
-
-================================================================================
 BUG 25 — Spam de errores en el log por vehículos bloqueados
+================================================================================
+SÍNTOMA:
+  El archivo de log se llena constantemente con errores relacionados con vehículos
+  bloqueados (locked), incluso cuando no deberían procesarse.
 CAUSA:
-  HandleExterior intentaba despawnear vehículos bloqueados en cada tick.
+  HandleExterior intentaba despawnear vehículos bloqueados en cada tick, generando
+  comprobaciones fallidas y errores de acceso.
 SOLUCIÓN:
-  Añadir protección temprana para vehículos con IsLocked = true.
+  Añadir protección temprana para vehículos con IsLocked = true tanto en
+  HandleExterior como en DespawnHandler.Execute.
 ARCHIVOS: Insurance/Observer/AliveVehicleDespawn.cs, Dormancy/DespawnHandler.cs
 
 ================================================================================
 BUG 26 — Falsos positivos en IsInsured
+================================================================================
+SÍNTOMA:
+  Vehículos que no están asegurados aparecen como asegurados en la interfaz,
+  permitiendo acciones que no deberían (ej: reclamar un coche ajeno).
 CAUSA:
-  Solo se comparaba la placa, no el modelo.
+  La verificación solo comparaba la placa, no el modelo. Dos vehículos distintos
+  con la misma placa (posible por bugs o mods) se confundían.
 SOLUCIÓN:
   Añadir comparación de ModelName en la verificación.
 ARCHIVO: DB/Core.cs (IsInsured)
 
 ================================================================================
 BUG 27 — Spawn de addons problemáticos incluso con timeout
+================================================================================
+SÍNTOMA:
+  Algunos vehículos addon (ej: H2, Supra) no spawnean al recuperarlos, aunque el
+  modelo existe y está instalado. El sistema reintenta pero falla siempre.
 CAUSA:
-  Limitación de SHVDN/C# frente a C++ nativo.
+  Limitación de SHVDN/C# frente a C++ nativo. El método Request(model) no siempre
+  garantiza que el modelo esté listo para spawnear, especialmente en addons pesados.
 SOLUCIÓN:
-  Implementar timeout de 1.5s/3s y documentar como limitación conocida.
-  Mensaje humorístico: "Dale las gracias a la kk de C#."
+  Implementar timeout de 1.5s (y 3s en segundo intento) y documentar como limitación
+  conocida. Se añade mensaje humorístico: "Dale las gracias a la kk de C#."
 ARCHIVO: Helpers/Spawn/VehicleSpawnManager.cs
+
+================================================================================
+BUG 28 — Garaje de Franklin en Vinewood Hills no detectado como garaje
+================================================================================
+SÍNTOMA:
+  Al guardar un vehículo en el garaje de Franklin en Vinewood Hills, el sistema no
+  lo reconoce como garaje y lo trata como vehículo en la calle, causando pérdidas.
+CAUSA:
+  El nombre usado en GarageNames era "Franklin - Vinewood Hills", pero el nombre real
+  en los datos del juego (XML de OpenIV) es "Franklin - Hills".
+SOLUCIÓN:
+  Renombrar la entrada en GarageNames a "Franklin - Hills".
+ARCHIVO: Helpers/VehiclesInGarage.cs
+
+================================================================================
+BUG 29 — Costo de recuperación de vehículo no aplica el 25% de deducible
+================================================================================
+SÍNTOMA:
+  Al recuperar un vehículo destruido, el costo mostrado y cobrado es el 100% del valor
+  en lugar del 25% establecido en las constantes.
+CAUSA:
+  En Calculator.GetRecoverCost solo se multiplicaba por ModSettings.RecoverMult,
+  ignorando Constants.RECOVER_PERCENT (0.25f).
+SOLUCIÓN:
+  Multiplicar el baseCost por Constants.RECOVER_PERCENT * ModSettings.RecoverMult.
+ARCHIVO: Insurance/Policies/Calculator.cs
+
+================================================================================
+BUG 30 — new None<float>() provocaba error de acceso por constructor privado
+================================================================================
+SÍNTOMA:
+  El juego lanza una excepción al intentar calcular la altura del suelo para spawnear
+  un vehículo, rompiendo la entrega del mecánico.
+CAUSA:
+  En SpawnHandler.GetGroundHeight se usaba new None<float>() para devolver un None.
+  Tras convertir None<T> en singleton (constructor privado), esa línea fallaba.
+SOLUCIÓN:
+  Cambiar new None<float>() por None<float>.Instance.
+ARCHIVO: Helpers/Spawn/Coordinates/SpawnHandler.cs
+
+================================================================================
+BUG 31 — Mecánico aparece en zonas inviables (vías de tren, autopistas en sentido contrario)
+================================================================================
+SÍNTOMA:
+  Al solicitar un vehículo al mecánico, el coche aparece sobre vías de tren, en
+  autopistas en sentido contrario o en lugares donde el conductor no puede circular,
+  quedándose atascado.
+CAUSA:
+  El método SpawnHandler.GetValidRoad utilizaba el native GET_NTH_CLOSEST_VEHICLE_NODE
+  sin filtrar los nodos problemáticos. Este native devuelve cualquier nodo de vehículo,
+  incluyendo vías de tren, nodos en sentido contrario al tráfico y autopistas conflictivas.
+SOLUCIÓN:
+  Reemplazar GET_NTH_CLOSEST_VEHICLE_NODE por GET_CLOSEST_VEHICLE_NODE_WITH_HEADING
+  con flags de exclusión (1|2|4 = 7), nodeType = 1 (carretera normal) y radio 30 m.
+ARCHIVOS MODIFICADOS:
+  - Helpers/Spawn/Coordinates/SpawnHandler.cs
+  - Helpers/Constants.cs (nuevas constantes)
+
+================================================================================
+BUG 32 — Al pedir un vehículo al mecánico se crea un duplicado en lugar de teletransportar el existente
+================================================================================
+SÍNTOMA:
+  Cada vez que se solicita un vehículo al mecánico (distancia entre 200 m y 600 m),
+  aparece un conductor conduciendo el coche desde su posición original, pero a veces
+  se duplica o el sistema crea uno nuevo en lugar de traer el existente.
+CAUSA:
+  El flujo original siempre llamaba a ScheduleDelivery, que creaba un nuevo Data y
+  conductor, pero no teletransportaba. Para optimizar se decidió implementar
+  teletransporte, pero la implementación inicial no incluía el frenado adecuado.
+SOLUCIÓN:
+  En Bring.Execute se añadió una rama para teletransporte cuando la distancia está
+  entre 200 m y 600 m. Se creó VehicleTeleport.Execute que teletransporta el vehículo
+  a 150 m detrás de la cámara, lo frena y congela durante 250 ms para estabilizarlo,
+  luego crea el conductor.
+ARCHIVOS MODIFICADOS/NUEVOS:
+  - Insurance/Delivery/Bring.cs
+  - Insurance/Delivery/VehicleTeleport.cs (nuevo)
+  - Insurance/Delivery/Incoming.cs
+  - Helpers/Teleport.cs
+  - Helpers/Constants.cs
+
+================================================================================
+BUG 33 — El conductor se baja abruptamente y el vehículo sigue avanzando
+================================================================================
+SÍNTOMA:
+  Durante una entrega del mecánico, cuando el vehículo se acerca al jugador, el
+  conductor desaparece de repente (sin animación de salida) y el coche continúa
+  avanzando por inercia, a veces chocando o alejándose.
+CAUSA:
+  La lógica de llegada estaba duplicada y mal sincronizada: Completion.ForceIfNear
+  y TrackVehicleState.Execute tenían bloques redundantes que forzaban la salida con
+  diferentes umbrales. No se garantizaba que el vehículo estuviera completamente
+  detenido antes de eliminar al conductor.
+SOLUCIÓN:
+  - Simplificar TrackVehicleState.Execute eliminando bloques duplicados de llegada.
+  - Reforzar Completion.ForceIfNear como único responsable de la bajada.
+  - Añadir frenado forzado (Velocity = Zero, SET_VEHICLE_FORWARD_SPEED = 0) antes de LeaveVehicle.
+  - Actualizar incoming.destination en cada tick a la posición actual del jugador.
+ARCHIVOS MODIFICADOS:
+  - Insurance/Delivery/Completion.cs
+  - Insurance/Delivery/TrackVehicleState.cs
+  - Helpers/Constants.cs (ajustes de constantes)
+
+  ================================================================================
+BUG 34 — Excepción ArgumentOutOfRangeException en TrackVehicleState.Execute al morir durante entrega del mecánico
+================================================================================
+
+SÍNTOMA:
+  El jugador solicita un vehículo al mecánico. Antes de que el conductor llegue,
+  el jugador muere o falla la misión (por ejemplo, en un punto de control de una
+  misión). Al reiniciar el checkpoint, el script lanza una excepción del tipo:
+
+    System.ArgumentOutOfRangeException: El índice estaba fuera del intervalo.
+    en System.Collections.Generic.List`1.RemoveAt(Int32 index)
+    en MMI_SP.Insurance.Delivery.TrackVehicleState.Execute(List`1 incomingVehicles)
+    en MMI_SP.Insurance.Observer.Manager.UpdateIncomingVehicles()
+    ... (el script se aborta)
+
+  El error es reproducible específicamente cuando el vehículo del mecánico queda
+  en estado "muerto" (IsDead = true) al reiniciar.
+
+CAUSA RAÍZ — DOBLE ELIMINACIÓN DE LA MISMA ENTRADA:
+  El flujo de cancelación de la entrega involucra dos eliminaciones del mismo
+  elemento de la lista `incomingVehicles`, sin que medie una verificación de que
+  el elemento aún exista.
+
+  Secuencia exacta del error:
+
+  1. `TrackVehicleState.Execute` itera la lista `incomingVehicles` (hacia atrás).
+  2. Detecta que `incoming.vehicle.IsDead` es true.
+  3. Llama a `Manager.CannotBringVehicle(incoming, cost)`.
+  4. Dentro de `Manager.CannotBringVehicle`, se invoca a `Completion.Execute(incoming, refund, incomingVehicles)`.
+  5. Dentro de `Completion.Execute`:
+       - Notifica fallo, reembolsa, borra el conductor, repara el vehículo.
+       - **Ejecuta `incomingVehicles.Remove(incoming)`**  ← Primera eliminación.
+  6. El control regresa a `TrackVehicleState.Execute`, justo después de la llamada a `CannotBringVehicle`.
+  7. **Inmediatamente** el código ejecuta `incomingVehicles.RemoveAt(i)`  ← Segunda eliminación.
+  8. En este punto, la lista ya no contiene el elemento (fue eliminado en el paso 5). `RemoveAt(i)` intenta acceder a una posición que ya no existe (especialmente si la lista quedó vacía) y lanza `ArgumentOutOfRangeException`.
+
+  El problema se hace más evidente tras un reinicio de checkpoint porque el motor
+  del juego invalida todas las entidades, dejando el vehículo en `IsDead = true`
+  y la lista `incomingVehicles` suele contener un solo elemento.
+
+SOLUCIÓN APLICADA — RESPONSABILIDAD ÚNICA DE MODIFICACIÓN DE LA LISTA:
+
+  La corrección consiste en garantizar que **solo el iterador** (la clase que
+  recorre la lista) sea quien añada o elimine elementos. Las funciones auxiliares
+  no deben mutar la colección.
+
+  Cambios concretos:
+
+  ------------------------------------------------------------------------------
+  Archivo: Insurance/Delivery/Completion.cs
+  ------------------------------------------------------------------------------
+  - Dentro del método `Execute`, se ELIMINA la línea que hacía:
+      incomingVehicles.Remove(incoming);
+
+    La función se limita ahora a:
+      • Notificar al jugador.
+      • Reembolsar si corresponde.
+      • Eliminar el conductor (ped).
+      • Reparar el vehículo si aún existe y no está muerto.
+
+    La firma del método y los demás parámetros permanecen igual.
+
+  Código antes:
+  internal static void Execute(Data incoming, int refund, List<Data> incomingVehicles)
+  {
+      NotifyFailure();
+      Refund(incoming, refund);
+      incoming.driver.Delete();
+      RepairIfAlive(incoming);
+      incomingVehicles.Remove(incoming);  // ← PROBLEMA
+  }
+
+Código después:
+internal static void Execute(Data incoming, int refund, List<Data> incomingVehicles)
+{
+    NotifyFailure();
+    Refund(incoming, refund);
+    incoming.driver.Delete();
+    RepairIfAlive(incoming);
+    // La lista NO se modifica aquí.
+}
+Archivo: Insurance/Delivery/TrackVehicleState.cs
+
+Se conservan las llamadas a incomingVehicles.RemoveAt(i) porque ahora son
+la única eliminación que ocurre. No se duplican.
+
+Se añade explícitamente continue; después de cada RemoveAt para evitar
+que el resto del cuerpo del bucle se ejecute con un elemento ya eliminado
+(aunque el bucle es hacia atrás, es buena práctica y robustez).
+
+Bloques modificados dentro de TrackVehicleState.Execute:
+
+// Bloque cuando el vehículo está destruido
+if (incoming.vehicle.IsDead)
+{
+    int cost = Policies.Manager.GetCost(incoming.vehicle);
+    Manager.CannotBringVehicle(incoming, cost);
+    incomingVehicles.RemoveAt(i);
+    continue;
+}
+
+// Bloque de timeout
+if (Game.GameTime - incoming.calledTime > timeoutMs)
+{
+    Manager.CannotBringVehicle(incoming);
+    incomingVehicles.RemoveAt(i);
+    continue;
+}
+Archivos adicionales afectados (ninguno, ya que el resto del código no depende
+de la eliminación dentro de Completion.Execute).
+
+EFECTO DE LA CORRECCIÓN:
+
+Completion.Execute deja de modificar incomingVehicles.
+
+TrackVehicleState.Execute es el único responsable de eliminar elementos
+de la lista, lo hace una sola vez por cada caso de fallo o finalización.
+
+Al reiniciar un checkpoint, el vehículo muerto se detecta, se llama a
+CannotBringVehicle (que ya no borra de la lista) y luego TrackVehicleState
+elimina el elemento de forma segura. No hay doble eliminación, no hay excepción.
+
+OTRAS MEJORAS IMPLÍCITAS:
+
+El código es más claro y mantenible: la responsabilidad de la colección está
+centralizada en el bucle que itera.
+
+Se elimina el acoplamiento entre Completion.Execute y la lista, permitiendo
+que esa función pueda ser reutilizada en otros contextos sin efectos laterales
+inesperados.
+
+ARCHIVOS MODIFICADOS:
+
+Insurance/Delivery/Completion.cs
+
+Insurance/Delivery/TrackVehicleState.cs
 
 ================================================================================
 FIN DEL REGISTRO

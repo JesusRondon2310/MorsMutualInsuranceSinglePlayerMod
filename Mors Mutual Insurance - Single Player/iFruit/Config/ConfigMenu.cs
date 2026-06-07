@@ -15,6 +15,7 @@ namespace MMI_SP.iFruit.Config
             BuildiFruit();
             BuildInsurance();
             BuildBringVehicle();
+            BuildVehicleUtilities();
         }
 
         private void BuildiFruit()
@@ -22,8 +23,6 @@ namespace MMI_SP.iFruit.Config
             var sub = ConfigMenuBuilder.AddSubMenu(_pool, _mainMenu, "iFruit");
             ConfigMenuBuilder.AddListInt(sub, "iFruit", "PhoneVolume", ModSettings.iFruitVolume, "Volumen del teléfono",
                 Constants.PHONE_VOLUME_MIN, Constants.PHONE_VOLUME_MAX, Constants.PHONE_VOLUME_STEP);
-            ConfigMenuBuilder.AddActionItem(sub, "Buscar vehículos perdidos", () => Helpers.VehicleRecoveryHelper.RecoverLostVehicles());
-            ConfigMenuBuilder.AddActionItem(sub, "Eliminar duplicados del lote", () => Helpers.VehicleRecoveryHelper.CleanDuplicatesInImpound());
         }
 
         private void BuildInsurance()
@@ -35,7 +34,7 @@ namespace MMI_SP.iFruit.Config
                 Constants.INSURANCE_MULT_MIN, Constants.INSURANCE_MULT_MAX, Constants.INSURANCE_MULT_STEP);
         }
 
-        private void BuildBringVehicle()
+      private void BuildBringVehicle()
         {
             var sub = ConfigMenuBuilder.AddSubMenu(_pool, _mainMenu, "Traer vehículo");
             ConfigMenuBuilder.AddListInt(sub, "BringVehicle", "BringVehicleBasePrice", ModSettings.BringVehicleBasePrice, "Precio base",
@@ -45,5 +44,12 @@ namespace MMI_SP.iFruit.Config
             ConfigMenuBuilder.AddListInt(sub, "BringVehicle", "BringVehicleTimeout", ModSettings.BringVehicleTimeout, "Tiempo de espera",
                 Constants.BRING_VEHICLE_TIMEOUT_MIN, Constants.BRING_VEHICLE_TIMEOUT_MAX, Constants.BRING_VEHICLE_TIMEOUT_STEP);
         }
+        
+      private void BuildVehicleUtilities()
+      {
+         var sub = ConfigMenuBuilder.AddSubMenu(_pool, _mainMenu, "Utilidades de vehículos");
+         ConfigMenuBuilder.AddActionItem(sub, "Buscar vehículos perdidos", () => Helpers.VehicleRecoveryHelper.RecoverLostVehicles());
+         ConfigMenuBuilder.AddActionItem(sub, "Eliminar duplicados", () => Helpers.VehicleRecoveryHelper.CleanDuplicatesInRadius());
+      }
     }
 }

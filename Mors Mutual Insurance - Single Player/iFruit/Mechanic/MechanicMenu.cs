@@ -1,11 +1,12 @@
 ﻿using NativeUI;
 using MMI_SP.Config;
+using MMI_SP.Helpers;
 
 namespace MMI_SP.iFruit.Mechanic
 {
     internal class MechanicMenu : MenuBase
     {
-        private static readonly string MechanicBanner = ModSettings.BaseDir + "\\mechanic_banner.png";
+        private static readonly string MechanicBanner = ModSettings.BaseDir + Constants.DEFAULT_MECHANIC_BANNER_IMAGE_EXPR;
         private UIMenu _bringSubmenu;
 
         public override bool IsAnyMenuVisible => base.IsAnyMenuVisible || (_bringSubmenu?.Visible == true);

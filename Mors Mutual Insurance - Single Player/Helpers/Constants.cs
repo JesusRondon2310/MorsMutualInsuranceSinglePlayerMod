@@ -6,6 +6,26 @@ namespace MMI_SP.Helpers
    public static class Constants
    {
       // ==========================================
+      // BLOQUE: Valores predeterminados
+      // ==========================================
+      public const float DEFAULT_INSURANCE_MULT = 1.0f;
+      public const float DEFAULT_RECOVER_MULT = 1.0f;
+      public const int DEFAULT_IFRUIT_VOLUME = 25;
+      public const int DEFAULT_BRING_BASE_PRICE = 1500;
+      public const int DEFAULT_BRING_RADIUS = 100;
+      public const int DEFAULT_BRING_TIMEOUT = 5;
+      public const float DEFAULT_PLAYER_POS_X = -822.528f;
+      public const float DEFAULT_PLAYER_POS_Y = -260.00f;
+      public const float DEFAULT_PLAYER_POS_Z = 35.79341f;
+      public const string INSURANCE_IMAGE_SOURCE = "Resources/insurance.png";
+      public const string MMI_BANNER_FILENAME = "banner.png";
+      public const string INSURANCE_SPRITE_FILENAME = "insurance.png";
+      public static readonly string DEFAULT_BASE_DIR_EXPR = "\\MMI";
+      public static readonly string DEFAULT_MMI_BANNER_IMAGE_EXPR = "\\banner.png";
+      public static readonly string DEFAULT_MECHANIC_BANNER_IMAGE_EXPR = "\\mechanic_banner.png";
+      public static readonly string DEFAULT_INSURANCE_IMAGE_EXPR = "\\insurance.png";
+
+      // ==========================================
       // BLOQUE: Tiempos de espera y Valores numéricos genéricos
       // ==========================================
       public const int NONE = 0;           // Para comparaciones de cantidad (0 elementos)
@@ -71,7 +91,7 @@ namespace MMI_SP.Helpers
       public const float ARRIVAL_PRECISION_DIST = 15.0f;   // distancia horizontal para considerar llegada
       public const float ARRIVAL_PRECISION_ALT = 2.0f;    // diferencia de altura para considerar llegada
       public const float ARRIVAL_DISTANCE = 35.0f;
-      public const float ARRIVAL_MINIMUN_SPEED  = 3.0f;
+      public const float ARRIVAL_MINIMUN_SPEED = 3.0f;
       public const float ARRIVAL_RADIUS = 20.0f;         // Radio de seguimiento de ruta
       public const int TELEPORT_FREEZE_MS = 250;
       public const int MINUTE_MS = 60000;  // milisegundos en un minuto

@@ -56,6 +56,7 @@
   <ItemGroup>
     <Reference Include="iFruitAddon2">
       <HintPath>..\referencias\iFruitAddon2.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="NativeUI">
@@ -66,10 +67,12 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\referencias\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="ScriptHookVDotNet3">
       <HintPath>..\referencias\ScriptHookVDotNet3.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>

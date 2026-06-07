@@ -1,5 +1,6 @@
 ﻿using GTA.Math;
 using MMI_SP.PatternMatching;
+using MMI_SP.Helpers;
 using System;
 using System.IO;
 
@@ -10,24 +11,23 @@ namespace MMI_SP.Config
         // ==========================================
         // BLOQUE 1: Datos
         // ==========================================
-        internal static readonly string BaseDir = AppDomain.CurrentDomain.BaseDirectory + "\\MMI";
-        internal static readonly string BannerImage = BaseDir + "\\banner.png";
-        internal static readonly string InsuranceImage = BaseDir + "\\insurance.png";
+        internal static readonly string BaseDir = AppDomain.CurrentDomain.BaseDirectory + Constants.DEFAULT_BASE_DIR_EXPR;
+        internal static readonly string BannerImage = BaseDir + Constants.DEFAULT_MMI_BANNER_IMAGE_EXPR;
+        internal static readonly string InsuranceImage = BaseDir + Constants.DEFAULT_INSURANCE_IMAGE_EXPR;
 
-        public static float InsuranceMult { get; set; } = 1.0f;
-        public static float RecoverMult { get; set; } = 1.0f;
+        public static float InsuranceMult { get; set; } = Constants.DEFAULT_INSURANCE_MULT;
+        public static float RecoverMult { get; set; } = Constants.DEFAULT_RECOVER_MULT;
         public static bool PersistentVehicles { get; set; } = true;
-        public static Vector3 PlayerPos => new Vector3(-822.528f, -260.00f, 35.79341f);
-
-        public static int iFruitVolume { get; set; } = 25;
+        public static Vector3 PlayerPos => new Vector3(Constants.DEFAULT_PLAYER_POS_X, Constants.DEFAULT_PLAYER_POS_Y, Constants.DEFAULT_PLAYER_POS_Z);
+        public static int iFruitVolume { get; set; } = Constants.DEFAULT_IFRUIT_VOLUME;
         public static bool CaniFruitInsure { get; set; } = true;
         public static bool CaniFruitCancel { get; set; } = true;
         public static bool CaniFruitRecover { get; set; } = true;
 
-        public static int BringVehicleBasePrice { get; set; } = 1500;
+        public static int BringVehicleBasePrice { get; set; } = Constants.DEFAULT_BRING_BASE_PRICE;
         public static bool BringVehicleInstant { get; set; } = false;
-        public static int BringVehicleRadius { get; set; } = 100;
-        public static int BringVehicleTimeout { get; set; } = 5;
+        public static int BringVehicleRadius { get; set; } = Constants.DEFAULT_BRING_RADIUS;
+        public static int BringVehicleTimeout { get; set; } = Constants.DEFAULT_BRING_TIMEOUT;
 
         // ==========================================
         // BLOQUE 2: Funciones
@@ -38,7 +38,7 @@ namespace MMI_SP.Config
                 Directory.CreateDirectory(BaseDir);
 
             if (!File.Exists(InsuranceImage))
-                File.Copy("Resources/insurance.png", InsuranceImage);
+                File.Copy(Constants.INSURANCE_IMAGE_SOURCE, InsuranceImage);
 
             Persistence.Initialize();
             Persistence.LoadFromSettings();

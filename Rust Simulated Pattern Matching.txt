@@ -20,10 +20,11 @@ INDICE
    7.5. (Opcional) parametros con 'in' para estructuras grandes
    7.6. No ignorar nunca un Result<T>
    7.7. unwrap_or solo para valores con fallback obvio
-   7.8. Usar match en lugar de is_some() + cast para Option<T>
-   7.9. Usar unwrap_or en lugar de is_ok() + cast para Result<T>
+   7.8. Prohibido el cast directo ciego (Blind Cast)
+   7.9. Extraccion segura: match, unwrap_or, o Pattern Matching (Anti-Hadouken)
    7.10. No usar null como valor de retorno
    7.11. Excepcion controlada: uso de objetos mutables externos
+   7.12. Elegir entre match y pattern matching según el caso
 8. Comparacion con try/catch tradicional
 9. Limitaciones en C# 7.3
 
@@ -86,10 +87,10 @@ Estructura:
 
 Metodos:
 --------
-  is_ok()   -> true si es Ok<T>
-  is_err()  -> true si es Err<T>
-  Value     -> el valor dentro de Ok<T>
-  Message   -> el mensaje dentro de Err<T>
+  is_ok()  -> true si es Ok<T>
+  is_err() -> true si es Err<T>
+  Value    -> el valor dentro de Ok<T> (acceso seguro via pattern matching)
+  Message  -> el mensaje dentro de Err<T> (acceso seguro via pattern matching)
 
 Metodo principal:
 -----------------
@@ -142,13 +143,13 @@ Estructura:
     |
     +-- Some<T>     (hay valor, contiene un T)
     |
-    +-- None<T>     (no hay valor)
+    +-- None<T>     (no hay valor, usa Singleton Instance)
 
 Metodos:
 --------
   is_some() -> true si es Some<T>
   is_none() -> true si es None<T>
-  Value     -> el valor dentro de Some<T>
+  Value     -> el valor dentro de Some<T> (acceso seguro via pattern matching)
 
 Metodo principal:
 -----------------
@@ -175,25 +176,26 @@ Metodo de extraccion segura:
   Uso tipico:
     var value = option.unwrap_or(0);
 
+Conversion a Result:
+-------------------
+  ok_or(string errorMessage) -> Result<T>
+
+  Convierte Option<T> en Result<T>. Si es Some, devuelve Ok con el valor.
+  Si es None, devuelve Err con el mensaje personalizado.
+
+  Uso tipico:
+    var result = option.ok_or("No se encontro el recurso");
+
 Metodos estaticos:
 ------------------
   Option.from_nullable<T>(T value) -> Option<T>
       Convierte un valor que podria ser null en Some o None.
 
-  Option.new_none<T>() -> None<T>
-      Crea un None<T> sin tener que escribir new None<T>() manualmente.
+  Option.from_nullable_value<T>(T? value) -> Option<T>
+      Convierte un nullable de tipo valor en Some o None.
 
-Ejemplo visual de flujo:
-------------------------
-  Option.from_nullable(GetLastVehicle())
-      |
-      +--> Vehiculo existe -> Devuelve Some<Vehicle>(vehiculo)
-      |         |
-      |         +--> match ejecuta onSome -> usa el vehiculo
-      |
-      +--> Vehiculo es null -> Devuelve None<Vehicle>()
-                |
-                +--> match ejecuta onNone -> muestra "no hay vehiculo"
+  Option.new_none<T>() -> None<T>
+      Obtiene la instancia Singleton None<T>.Instance.
 
 
 ================================================================================
@@ -203,7 +205,7 @@ Ejemplo visual de flujo:
 5.1. Metodo que devuelve Result<T>
 ----------------------------------
   // Definicion del metodo
-  public static Result<bool> Insure(in Vehicle veh)
+  public static Result<bool> Insure(Vehicle veh)   // sin 'in' para clases
   {
       if (veh == null || !veh.Exists())
           return new Err<bool>("No hay vehiculo que asegurar.");
@@ -265,15 +267,17 @@ Ejemplo visual de flujo:
 -------------------------------------
   // En vez de un match completo para obtener un valor con fallback:
   var cost = GetInsuranceCost(veh).unwrap_or(0);
+  var vehicleName = GetLastVehicle().map(v => v.DisplayName).unwrap_or("Desconocido");
 
 
-5.5. Comprobaciones rapidas con is_ok / is_err / is_some / is_none
--------------------------------------------------------------------
-  if (result.is_err())
-      Logger.Error("Fallo al asegurar el vehiculo.");
-
-  if (option.is_none())
-      return new Err<bool>("No hay vehiculo.");
+5.5. Filtro rapido con Pattern Matching (Early Return)
+-------------------------------------------------------
+  // Extraer el error de forma segura y abortar ejecucion.
+  if (result is Err<bool> err)
+  {
+      Logger.Error(err.Message);
+      return;
+  }
 
 
 ================================================================================
@@ -328,7 +332,7 @@ Ejemplo visual de flujo:
 
 7.1. match<TResult> siempre con tipo explicito
 ----------------------------------------------
-  MAL:  result.match(onOk: ..., onErr: ...)           // CS0411
+  MAL:  result.match(onOk: ..., onErr: ...)            // CS0411
   BIEN: result.match<bool>(onOk: ..., onErr: ...)
   BIEN: result.match<string>(onOk: ..., onErr: ...)
 
@@ -344,18 +348,9 @@ Ejemplo visual de flujo:
 ----------------------------------------------------
   MAL:
     if (result.is_ok()) {
-        var ok = (Ok<bool>)result;
+        var ok = (Ok<bool>)result; // Cast ciego peligroso
         // hacer algo
-    } else {
-        var err = (Err<bool>)result;
-        // hacer otra cosa
     }
-
-  BIEN:
-    result.match<bool>(
-        onOk: _ => { /* hacer algo */; return true; },
-        onErr: error => { /* hacer otra cosa */; return false; }
-    );
 
 7.4. Las lambdas deben retornar un valor
 -----------------------------------------
@@ -365,95 +360,80 @@ Ejemplo visual de flujo:
 
 7.5. Parametros de estructuras grandes con 'in' (opcional)
 -----------------------------------------------------------
-  Para evitar copias innecesarias de objetos grandes.
-
-  public static Result<bool> Procesar(in MiStruct dato)
+  Solo aplica a structs: public static Result<bool> Procesar(in MiStruct dato)
 
 7.6. No ignorar nunca un Result<T>
 -----------------------------------
-  Si un metodo devuelve Result<bool>, captúralo y al menos loguea el error.
-
-  MAL:  Core.Insure(veh);
-  BIEN: Core.Insure(veh).match<bool>(
-            onOk: _ => true,
-            onErr: error => { Logger.Error(error); return false; }
-        );
+  Captúralo y al menos loguea el error.
 
 7.7. unwrap_or solo para valores con fallback obvio
 ----------------------------------------------------
   No usar unwrap_or cuando el error necesita ser logueado o notificado.
-  En ese caso usar match<TResult>.
 
-  MAL:  Core.Insure(veh).unwrap_or(false);  // el error desaparece silencioso
-  BIEN: var cost = GetInsuranceCost(veh).unwrap_or(0);  // fallback obvio y seguro
+7.8. Prohibido el cast directo ciego (Blind Cast)
+--------------------------------------------------
+  Jamas se debe hacer:
+    var data = ((Some<VehicleData>)option).Value;   // Lanza excepcion si es None
+    var value = ((Ok<int>)result).Value;            // Lanza excepcion si es Err
 
-7.8. Usar match en lugar de is_some() + cast para Option<T>
------------------------------------------------------------
-  MAL (cast inseguro):
-    if (dataOption.is_some()) {
-        var data = ((Some<VehicleData>)dataOption).Value;
-        // usar data
+  El cast forzado le dice al compilador "confia en mi". En esta arquitectura
+  asumimos que todo puede fallar. Forzar un cast rompe la seguridad.
+
+7.9. Extraccion segura: match, unwrap_or, o Pattern Matching (Anti-Hadouken)
+-----------------------------------------------------------------------------
+  Si el uso de `match` o `and_then` genera una anidacion excesiva de lambdas
+  (efecto "Hadouken" o Callback Hell), se permite y FOMENTA usar Pattern Matching 
+  con `is` para hacer clausulas de guarda (Early Returns).
+
+  MAL (Cast ciego):
+    if (result.is_ok()) { return ((Ok<int>)result).Value; }
+
+  BIEN (Pattern Matching seguro en C# 7.3):
+    if (result is Ok<int> ok) { 
+        return ok.Value; 
     }
-
-  BIEN:
-    dataOption.match(
-        onSome: data => { /* usar data */ },
-        onNone: () => { /* manejar ausencia */ }
-    );
-
-  El metodo match obliga a manejar ambos casos y elimina el cast explicito.
-  Nunca uses is_some() seguido de cast directo.
-
-7.9. Usar unwrap_or en lugar de is_ok() + cast para Result<T>
---------------------------------------------------------------
-  MAL (cast inseguro):
-    if (result.is_ok()) {
-        var value = ((Ok<Vehicle>)result).Value;
-        // usar value
+    
+    // O filtrando el error primero:
+    if (result is Err<int> err) {
+        Logger.Error(err.Message);
+        return default;
     }
-
-  BIEN (cuando existe valor por defecto no nulo):
-    var value = result.unwrap_or(defaultVehicle);  // defaultVehicle no es null
-
-  Si no hay un valor por defecto sensato, usa match<T> en lugar de unwrap_or.
-  Recuerda que unwrap_or solo debe usarse con valores por defecto NO NULOS.
-
-  Ejemplo correcto:
-    var cost = GetInsuranceCost(veh).unwrap_or(0);      // 0 es fallback valido
-    var vehicle = FindVehicle(id).unwrap_or(null);      // ❌ NUNCA hagas esto
 
 7.10. No usar null como valor de retorno
 ----------------------------------------
-  En un codigo funcional, null no debe existir. Todo valor que puede estar
-  ausente debe ser representado con Option<T>.
-
-  MAL:
-    public Vehicle FindVehicle(string id) {
-        Vehicle veh = ...;
-        if (veh == null) return null;   // retornar null
-        return veh;
-    }
-
-  BIEN:
-    public Option<Vehicle> FindVehicle(string id) {
-        Vehicle veh = ...;
-        return Option.from_nullable(veh);   // convierte null en None
-    }
-
-  Regla: Ningun metodo publico o interno debe devolver null.
-  Si el metodo puede no encontrar el valor, devuelve Option<T>.
-  Si el metodo puede fallar, devuelve Result<T, string>.
-
-  Excepcion: Los metodos que interactuan directamente con APIs externas
-  pueden recibir null, pero deben convertirlo inmediatamente a Option<T> con
-  Option.from_nullable.
+  Ningun metodo publico o interno debe devolver null. Usa Option<T> o Result<T>.
 
 7.11. Excepcion controlada: uso de objetos mutables externos
 ------------------------------------------------------------
-  El sistema evita depender de objetos mutables de APIs externas, pero existen
-  casos legitimamente necesarios (por ejemplo, leer propiedades de un objeto
-  del juego para construir un DTO inmutable). En esos casos se permite el
-  acceso directo, pero debe estar claramente documentado como excepcion.
+  Permitido solo para leer propiedades del juego para construir DTOs inmutables.
+
+7.12. Elegir entre match y pattern matching según el caso
+--------------------------------------------------------
+  Usa match<TResult> SOLO cuando necesites manejar AMBOS casos (Some/None o
+  Ok/Err) de forma exhaustiva y devolver un mismo tipo TResult.
+
+  Si solo te interesa UN caso (por ejemplo, solo cuando es Some o solo cuando
+  es Ok), usa pattern matching con 'is' para extraer el valor de forma segura
+  sin lambdas ni closures.
+
+  MAL (match innecesario para un solo caso):
+    string name = option.match<string>(
+        onSome: veh => veh.DisplayName,
+        onNone: () => "Desconocido"
+    );
+
+  BIEN (pattern matching directo para el caso que interesa):
+    if (option is Some<Vehicle> someVeh)
+    {
+        string name = someVeh.Value.DisplayName;
+        // usar name
+    }
+
+  BIEN (cuando necesitas manejar ambos casos con lógica diferente):
+    option.match<bool>(
+        onSome: veh => { /* usar veh */; return true; },
+        onNone: () => { /* no hay vehículo */; return false; }
+    );  
 
 
 ================================================================================
@@ -482,7 +462,7 @@ Usando try/catch:
 
 Usando Result<T>:
 -----------------
-  public Result<bool> Insure(in Vehicle veh)
+  public Result<bool> Insure(Vehicle veh)
   {
       if (veh == null) return new Err<bool>("No hay vehiculo");
       if (IsInsured(veh)) return new Err<bool>("Ya esta asegurado");
@@ -500,8 +480,7 @@ Usando Result<T>:
 Ventajas de Result<T>:
 ----------------------
   - El que llama SABE si funciono o no.
-  - El que llama TIENE el mensaje de error.
-  - El compilador OBLIGA a manejar ambos casos.
+  - El que llama TIENE el mensaje de error de forma segura.
   - No hay excepciones escondidas.
   - El flujo es lineal y predecible.
 
@@ -521,8 +500,8 @@ Lo que SI podemos hacer en C# 7.3:
 ----------------------------------
   - Clases abstractas con herencia sellada (Ok, Err, Some, None)
   - match<TResult> con Func<> (nuestra solucion)
-  - Pattern matching basico con 'is' y 'case'
-  - Inferencia de tipos en lambdas (aunque limitada, por eso ponemos tipos explicitos)
+  - Pattern matching basico con declaracion de variables (ej: if (obj is Ok<T> ok))
+ - Inferencia de tipos en lambdas (aunque limitada, por eso ponemos tipos explicitos)
 
 Por que no usamos switch:
 -------------------------

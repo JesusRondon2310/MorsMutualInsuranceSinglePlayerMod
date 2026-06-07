@@ -17,7 +17,8 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
       {
          OutputArgument groundZArg = new OutputArgument();
          bool success = Function.Call<bool>(Hash.GET_GROUND_Z_FOR_3D_COORD, position.X, position.Y, position.Z, groundZArg, false);
-         if (!success) return new None<float>();
+         
+         if (!success) return None<float>.Instance;
          return new Some<float>(groundZArg.GetResult<float>());
       }
 
@@ -25,7 +26,6 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
       // BLOQUE 2: Funciones
       // ==========================================
 
-      //FixedSpawnHandler
       public static EntityPosition GetPlayerReferencePosition() => new EntityPosition(ModSettings.PlayerPos, Constants.DEFAULT_HEADING);
 
       public static Result<Vector3> FixGround(Vector3 position)
@@ -42,31 +42,29 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
          OutputArgument outHeading = new OutputArgument();
 
          bool nodeFound = Function.Call<bool>(Hash.GET_CLOSEST_VEHICLE_NODE_WITH_HEADING, posX, posY, posZ, outPos, outHeading,
-         Constants.CLOSEST_ROAD, Constants.VALID_ROAD_SEARCH_RADIUS, Constants.GET_CLOSEST_VALID_ROAD);
+            Constants.CLOSEST_ROAD, Constants.VALID_ROAD_SEARCH_RADIUS, Constants.GET_CLOSEST_VALID_ROAD);
 
+         // CASO 1: No se encontró el nodo de la carretera
          if (!nodeFound)
          {
-            // Fallback: usar la posición original con altura de suelo (si es posible)
-            var fallbackHeight = GetGroundHeight(new Vector3(posX, posY, posZ));
-            if (fallbackHeight.is_some()) {
-               float groundZ = fallbackHeight.unwrap_or(Constants.GROUND_Z_FALLBACK);
-               return new Ok<Vector3>(new Vector3(posX, posY, groundZ + Constants.GROUND_OFFSET));
+            // ✅ APLICADA REGLA 7.9: Evaluamos y extraemos en un solo paso seguro sin unwrap_or redundantes
+            if (GetGroundHeight(new Vector3(posX, posY, posZ)) is Some<float> fallbackHeight) {
+               return new Ok<Vector3>(new Vector3(posX, posY, fallbackHeight.Value + Constants.GROUND_OFFSET));
             }
             return new Ok<Vector3>(new Vector3(posX, posY, posZ));
          }
 
          Vector3 nodePos = outPos.GetResult<Vector3>();
 
-         // Ajustar altura al suelo
-         var groundHeight = GetGroundHeight(nodePos);
-         if (groundHeight.is_some())
+         // CASO 2: Nodo encontrado, intentamos ajustar la altura al suelo real
+         // ✅ APLICADA REGLA 7.9: Código plano, ultra legible y libre de Hadoukens
+         if (GetGroundHeight(nodePos) is Some<float> groundHeight)
          {
-            float groundZ = groundHeight.unwrap_or(Constants.GROUND_Z_FALLBACK);
-            if (Math.Abs(nodePos.Z - groundZ) < Constants.MAX_ROAD_HEIGHT_DIFF)
-               return new Ok<Vector3>(new Vector3(nodePos.X, nodePos.Y, groundZ + Constants.GROUND_OFFSET));
+            if (Math.Abs(nodePos.Z - groundHeight.Value) < Constants.MAX_ROAD_HEIGHT_DIFF)
+               return new Ok<Vector3>(new Vector3(nodePos.X, nodePos.Y, groundHeight.Value + Constants.GROUND_OFFSET));
          }
 
-         // Si no se pudo ajustar, devolver el nodo tal cual
+         // Si no se pudo ajustar la altura, devolvemos el nodo nativo tal cual
          return new Ok<Vector3>(nodePos);
       }
 
@@ -92,6 +90,7 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
          bool success = Function.Call<bool>(Hash.GET_NTH_CLOSEST_VEHICLE_NODE, nodePos.X, nodePos.Y, nodePos.Z,
             Constants.CLOSEST_VEHICLE_NODE_INDEX, outPos, outHeading,
             Constants.VEHICLE_NODE_TYPE, Constants.CLOSEST_ROAD_SEARCH_RADIUS, Constants.VEHICLE_NODE_FLAGS);
+            
          if (!success) return fallbackHeading;
 
          return outHeading.GetResult<float>();
