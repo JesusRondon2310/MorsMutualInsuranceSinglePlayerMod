@@ -37,16 +37,16 @@ namespace MMI_SP.Insurance
             Vector3 finalPos = ((Ok<Vector3>)fixedPosResult).Value;
 
             // 5. Actualizar datos del vehículo (posición, heading, flags)
-            var updatedData = data.With(d =>
-            {
+            var updatedData = data.With(d => {
                 d.PosX = finalPos.X;
                 d.PosY = finalPos.Y;
                 d.PosZ = finalPos.Z;
                 d.Heading = spawnPos.Heading;
                 d.IsLocked = true;
                 d.IsDormant = false;
-                d.IsInGarage = false;
-                d.IsDestroyed = false;
+                d.IsInNativeGarage = false;
+               d.IsInInteriorGarage = false;
+               d.IsDestroyed = false;
             });
 
             // 6. Spawnear el vehículo (sin revalidar carretera, ya tenemos posición corregida)

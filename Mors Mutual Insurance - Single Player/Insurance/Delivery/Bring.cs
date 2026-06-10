@@ -32,7 +32,7 @@ namespace MMI_SP.Insurance.Delivery
             string vehId = VehicleIdentifier.Get(veh);
             var dataOption = DB.Core.FindVehicle(vehId);
             bool isInGarage = dataOption.match(
-                onSome: d => d.IsInGarage,
+                onSome: d => d.IsInNativeGarage || d.IsInInteriorGarage,
                 onNone: () => false
             );
 

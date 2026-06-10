@@ -28,7 +28,7 @@ namespace MMI_SP.Dormancy
             // Comprobar estados que impiden dormir
             if (data.IsLocked) return new Err<bool>("Vehículo bloqueado, no se puede dormir.");
 
-            if (data.IsInGarage) return new Err<bool>("Vehículo en garaje, no se puede dormir.");
+            if (data.IsInNativeGarage || data.IsInInteriorGarage) return new Err<bool>("Vehículo en garaje, no se puede dormir.");
 
             // Distancia desde la posición guardada en BD
             Vector3 dbPos = new Vector3(data.PosX, data.PosY, data.PosZ);
@@ -59,7 +59,8 @@ namespace MMI_SP.Dormancy
                 d.PosY = lastPosition.Y;
                 d.PosZ = lastPosition.Z;
                 d.IsDormant = true;
-                d.IsInGarage = false;
+               d.IsInNativeGarage = false;
+               d.IsInInteriorGarage = false;
             });
 
             var updateResult = DB.Core.Update(dormantData);

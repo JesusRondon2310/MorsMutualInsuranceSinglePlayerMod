@@ -49,7 +49,8 @@ namespace MMI_SP.DB
         [JsonProperty] public DateTime DestroyedAt { get; private set; }
         [JsonProperty] public bool IsLocked { get; private set; }
         [JsonProperty] public bool IsDormant { get; private set; }
-        [JsonProperty] public bool IsInGarage { get; private set; }
+        [JsonProperty] public bool IsInNativeGarage { get; private set; }      // garaje nativo (casa de Franklin, Michael, Trevor)
+        [JsonProperty] public bool IsInInteriorGarage { get; private set; }   // garaje interior comprado
 
         public VehicleData(
             string id, string modelName, string plate,
@@ -74,7 +75,8 @@ namespace MMI_SP.DB
             int plateStyle = 0,
             bool customTires = false,
             bool isDormant = false,
-            bool isInGarage = false,
+            bool isInNativeGarage = false,
+            bool isInInteriorGarage = false,
             string vehicleType = "")
         {
             Id = id;
@@ -104,7 +106,8 @@ namespace MMI_SP.DB
             DestroyedAt = destroyedAt == default ? DateTime.MinValue : destroyedAt;
             IsLocked = isLocked;
             IsDormant = isDormant;
-            IsInGarage = isInGarage;
+            IsInNativeGarage = isInNativeGarage;
+            IsInInteriorGarage = isInInteriorGarage;
         }
     }
 }

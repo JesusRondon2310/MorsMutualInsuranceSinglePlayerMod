@@ -19,13 +19,14 @@ namespace MMI_SP.Insurance.Observer
             if (dataOption.is_none()) return false;
             var data = ((Some<VehicleData>)dataOption).Value;
 
-            // Actualizar BD siempre (IsInGarage = true)
-            var updatedData = data.With(d => {
-                d.IsInGarage = true;
-                d.IsLocked = false;
-                d.IsDormant = false;
-            });
-            DB.Core.Update(updatedData);
+         // Actualizar BD siempre (IsInGarage = true)
+         var updatedData = data.With(d => {
+            if (VehiclesInGarage.IsDefaultGarage(currentVeh)) d.IsInNativeGarage = true;
+            else if (VehiclesInGarage.IsAnInteriorGarage(currentVeh)) d.IsInInteriorGarage = true;
+            d.IsLocked = false;
+            d.IsDormant = false;
+         });
+         DB.Core.Update(updatedData);
 
             if (VehiclesInGarage.IsAnInteriorGarage(currentVeh))
             {
@@ -51,15 +52,15 @@ namespace MMI_SP.Insurance.Observer
             if (dataOption.is_none()) return false;
             var data = ((Some<VehicleData>)dataOption).Value;
 
-            if (data.IsInGarage)
+            if (data.IsInInteriorGarage)
             {
                 // El vehículo pertenecía a un garaje interior: manejar salida con vehículo
                 Helpers.Spawn.InteriorVehicleRestorer.OnExitVehicle(currentVeh, Manager.InsuredVehList, Manager.BlipsToRemove);
             }
-            else
+            else if (data.IsInNativeGarage)
             {
                 // Garaje nativo: solo actualizar flag y persistencia
-                var updatedData = data.With(d => d.IsInGarage = false);
+                var updatedData = data.With(d => d.IsInNativeGarage = false);
                 DB.Core.Update(updatedData);
                 VehiclePersistence.SetPersistence(currentVeh, true);
             }

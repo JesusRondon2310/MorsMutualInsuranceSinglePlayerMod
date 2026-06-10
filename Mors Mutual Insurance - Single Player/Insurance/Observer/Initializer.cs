@@ -49,14 +49,14 @@ namespace MMI_SP.Insurance.Observer
                 if (data.IsDestroyed) continue;
 
                 // 1. Vehículos en garaje
-                if (data.IsInGarage)
+                if (data.IsInNativeGarage)
                 {
                     Vector3 lastPos = new Vector3(data.PosX, data.PosY, data.PosZ);
                     float dx = lastPos.X - VehiclesInGarage.GaragePosition[Constants.FIRST_INDEX].X;
                     float dy = lastPos.Y - VehiclesInGarage.GaragePosition[Constants.FIRST_INDEX].Y;
                     bool isInteriorGarage = (dx * dx + dy * dy) <= Constants.INTERIOR_GARAGE_RADIUS * Constants.INTERIOR_GARAGE_RADIUS;
 
-                    if (isInteriorGarage) continue; // Se restaurará bajo demanda en Garage.Entry
+                    if (isInteriorGarage && data.IsInInteriorGarage) continue; // Se restaurará bajo demanda en Garage.Entry
                     
                     else VehicleRestorer.ExecuteRestorationFrom(data, insuredVehList, blipsToRemove);
 

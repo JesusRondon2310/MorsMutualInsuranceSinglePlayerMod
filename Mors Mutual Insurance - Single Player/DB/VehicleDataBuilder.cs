@@ -21,9 +21,7 @@ namespace MMI_SP.DB
             }
 
             if (veh.Mods[VehicleToggleModType.Turbo].IsInstalled) mods[Constants.TURBO_MOD_INDEX] = Constants.MOD_INSTALLED;
-
             if (veh.Mods[VehicleToggleModType.XenonHeadlights].IsInstalled) mods[Constants.XENON_MOD_INDEX] = Constants.MOD_INSTALLED;
-
             if (!mods.ContainsKey(Constants.VARIATION_MOD_10) && Function.Call<bool>(Hash.GET_VEHICLE_MOD_VARIATION, veh, Constants.VARIATION_MOD_10))
                 mods[Constants.VARIATION_MOD_10] = Constants.MOD_INSTALLED;
 
@@ -69,6 +67,9 @@ namespace MMI_SP.DB
             if (veh == null || !veh.Exists()) return new Err<VehicleData>("El vehículo no existe.");
             if (string.IsNullOrEmpty(id)) return new Err<VehicleData>("ID de vehículo no válido.");
 
+            // Instalar kit de modificaciones ANTES de leer cualquier mod
+            veh.Mods.InstallModKit();
+
             // Datos básicos inmutables
             string modelName = Function.Call<string>(Hash.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL, veh.Model.Hash);
             string plate = veh.Mods.LicensePlate;
@@ -85,8 +86,6 @@ namespace MMI_SP.DB
             int tireSmokeColor = GetTireSmokeColor(veh);
             bool bulletproofTires = !Function.Call<bool>(Hash.GET_VEHICLE_TYRES_CAN_BURST, veh);
             bool customTires = Function.Call<bool>(Hash.GET_VEHICLE_MOD_VARIATION, veh, Constants.CUSTOM_TIRES_MOD_INDEX);
-
-            veh.Mods.InstallModKit();
 
             // Modificaciones (mods)
             var mods = GetModsDictionary(veh);
@@ -106,9 +105,9 @@ namespace MMI_SP.DB
             // Construir el DTO
             return new Ok<VehicleData>(new VehicleData(id, modelName, plate, primaryColor, secondaryColor, isDestroyed: false, windowTint: windowTint,
                 wheelType: wheelType, wheelColor: wheelColor, tireSmokeColor: tireSmokeColor, neonLeft: neonLeft, neonRight: neonRight,
-                neonFront: neonFront, neonBack: neonBack, neonColor: neonColor, bulletproofTires: bulletproofTires,
-                posX: posX, posY: posY, posZ: posZ, heading: heading, mods: mods, plateStyle: plateStyle, customTires: customTires, isLocked: false,
-                isDormant: false, isInGarage: false, vehicleType: vehicleType));
+                neonFront: neonFront, neonBack: neonBack, neonColor: neonColor, bulletproofTires: bulletproofTires, posX: posX, posY: posY,
+                posZ: posZ, heading: heading, mods: mods, plateStyle: plateStyle, customTires: customTires, isLocked: false,
+                isDormant: false, isInNativeGarage: false, isInInteriorGarage: false, vehicleType: vehicleType));
         }
     }
 }

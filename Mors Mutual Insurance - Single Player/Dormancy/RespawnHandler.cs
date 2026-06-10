@@ -1,4 +1,5 @@
 ﻿using GTA;
+using GTA.Native;
 using GTA.Math;
 using MMI_SP.Helpers;
 using MMI_SP.Helpers.Blips;
@@ -16,7 +17,6 @@ namespace MMI_SP.Dormancy
         // ==========================================
         // BLOQUE: Funciones auxiliares
         // ==========================================
-
         private static DormantVehicle FindDormant(string vehId, List<DormantVehicle> dormantVehicles)
         {
             return dormantVehicles.FirstOrDefault(d => d.Data?.Id == vehId);
@@ -38,18 +38,18 @@ namespace MMI_SP.Dormancy
             }
         }
 
-        private static bool AlreadyExistsInWorld(DormantVehicle dormant)
-        {
-            Model model = new Model(dormant.Data.ModelName);
-            return World.GetAllVehicles()
-                .Any(v => v.Mods.LicensePlate == dormant.Data.Plate && v.Model == model);
-        }
+      private static bool AlreadyExistsInWorld(DormantVehicle dormant)
+      {
+         return World.GetAllVehicles().Any(v =>
+             v.Mods.LicensePlate == dormant.Data.Plate &&
+             Function.Call<string>(Hash.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL, v.Model.Hash) == dormant.Data.ModelName
+         );
+      }
 
-        // ==========================================
-        // BLOQUE: Función principal
-        // ==========================================
-
-        internal static Result<Vehicle> Execute(string vehId, List<DormantVehicle> dormantVehicles)
+      // ==========================================
+      // BLOQUE: Función principal
+      // ==========================================
+      internal static Result<Vehicle> Execute(string vehId, List<DormantVehicle> dormantVehicles)
         {
             // 1. Buscar el vehículo dormante
             DormantVehicle dormant = FindDormant(vehId, dormantVehicles);
@@ -58,22 +58,21 @@ namespace MMI_SP.Dormancy
             // 2. Calcular posición de spawn
             var (spawnPos, spawnHeading) = CalculateSpawnPosition(dormant);
 
-            // 3. Verificar que no exista ya un vehículo con la misma placa en el mundo
+            // 3. Verificar que no exista ya un vehículo con la misma placa y modelo en el mundo
             if (AlreadyExistsInWorld(dormant)) return new Err<Vehicle>("El vehículo ya existe en el mundo, no se puede duplicar.");
 
             // 4. Actualizar datos en la BD (orquestador DB.Core)
-            var updatedData = dormant.Data.With(d =>
-            {
-                d.PosX = spawnPos.X;
-                d.PosY = spawnPos.Y;
-                d.PosZ = spawnPos.Z;
-                d.Heading = spawnHeading;
-                d.IsLocked = false;
-                d.IsDormant = false;
-                d.IsInGarage = false;
-                d.IsDestroyed = false;
+            var updatedData = dormant.Data.With(d => {
+               d.PosX = spawnPos.X;
+               d.PosY = spawnPos.Y;
+               d.PosZ = spawnPos.Z;
+               d.Heading = spawnHeading;
+               d.IsLocked = false;
+               d.IsDormant = false;
+               d.IsInNativeGarage = false;
+               d.IsInInteriorGarage = false;
+               d.IsDestroyed = false;
             });
-
             DB.Core.Update(updatedData);
 
             // 5. Spawnear el vehículo

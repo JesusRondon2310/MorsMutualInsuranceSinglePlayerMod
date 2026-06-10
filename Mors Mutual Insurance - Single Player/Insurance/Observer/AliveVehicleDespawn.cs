@@ -50,7 +50,7 @@ namespace MMI_SP.Insurance.Observer
             VehicleData data = ((Some<VehicleData>)dataOption).Value;
 
             // 5. Manejo especial: vehículo en depósito policial
-            if (data.IsInGarage && VehiclesInGarage.IsPositionInPoliceImpound(currentVeh.Position))
+            if ((data.IsInNativeGarage || data.IsInInteriorGarage) && VehiclesInGarage.IsPositionInPoliceImpound(currentVeh.Position))
             {
                 BlipCleanupHandler.RemoveByVehicle(currentVeh, blipsToRemove);
                 insuredVehList.RemoveAt(index);

@@ -14,7 +14,7 @@ namespace MMI_SP.Helpers.Spawn
         // ==========================================
         public static void OnEntry(Vehicle currentVeh, List<Vehicle> insuredVehList, Dictionary<string, Blip> blipsToRemove)
         {
-            // Si entro conduciendo, guardar posición y marcar IsInGarage = true
+            // Si entro conduciendo, guardar posición y marcar IsInInteriorGarage = true
             if (currentVeh != null && currentVeh.Exists() && currentVeh.Driver == Game.Player.Character)
             {
                 string vehId = VehicleIdentifier.Get(currentVeh);
@@ -26,7 +26,7 @@ namespace MMI_SP.Helpers.Spawn
                             d.PosY = currentVeh.Position.Y;
                             d.PosZ = currentVeh.Position.Z;
                             d.Heading = currentVeh.Heading;
-                            d.IsInGarage = true;
+                            d.IsInInteriorGarage = true;
                             d.IsLocked = false;
                             d.IsDormant = false;
                         });
@@ -37,8 +37,8 @@ namespace MMI_SP.Helpers.Spawn
                 );
             }
 
-            // Spawnear todos los vehículos con IsInGarage = true
-            var garageVehicles = DB.Core.GetAll().Where(v => v.IsInGarage && !v.IsDestroyed).ToList();
+            // Spawnear todos los vehículos con IsInInteriorGarage = true
+            var garageVehicles = DB.Core.GetAll().Where(v => v.IsInInteriorGarage && !v.IsDestroyed).ToList();
             foreach (var vd in garageVehicles)
             {
                 var existing = World.GetAllVehicles().FirstOrDefault(v => v.Mods.LicensePlate == vd.Plate && v.Model == new Model(vd.ModelName));
@@ -82,7 +82,7 @@ namespace MMI_SP.Helpers.Spawn
                 string vehId = VehicleIdentifier.Get(currentVeh);
                 DB.Core.FindVehicle(vehId).match<bool>(
                     onSome: data => {
-                        var updatedData = data.With(d => d.IsInGarage = false);
+                        var updatedData = data.With(d => d.IsInInteriorGarage = false);
                         DB.Core.Update(updatedData);
                         return true;
                     },

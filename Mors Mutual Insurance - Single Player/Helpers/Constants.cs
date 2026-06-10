@@ -93,7 +93,8 @@ namespace MMI_SP.Helpers
       public const float ARRIVAL_DISTANCE = 35.0f;
       public const float ARRIVAL_MINIMUN_SPEED = 3.0f;
       public const float ARRIVAL_RADIUS = 20.0f;         // Radio de seguimiento de ruta
-      public const int TELEPORT_FREEZE_MS = 250;
+      public const int TELEPORT_CARS_FREEZE_MS = 250;
+      public const int TELEPORT_BIKES_FREEZE_MS = 50;
       public const int MINUTE_MS = 60000;  // milisegundos en un minuto
 
       // ==========================================
@@ -121,6 +122,12 @@ namespace MMI_SP.Helpers
       // ==========================================
       public const float INTERIOR_GARAGE_RADIUS = 20f;
       public const float LS_POLICE_IMPOUND_RADIUS = 11f;
+
+      // ==========================================
+      // BLOQUE: Garajes y depósitos
+      // ==========================================
+      public const float CHECK_VEHICLES_RADIUS = 80f;
+      public const float DELETE_VEHICLES_RADIUS = 10f;
 
       // ==========================================
       // BLOQUE: Claves de recuperación (KeyManager)

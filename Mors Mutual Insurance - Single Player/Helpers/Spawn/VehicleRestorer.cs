@@ -24,82 +24,87 @@ namespace MMI_SP.Helpers.Spawn
          Model model = new Model(data.ModelName);
          bool modelLoaded = model.Request(Constants.MEDIUM_TIMEOUT_MS);
 
-         // 3. CASO A: Modelo cargado correctamente
+         // 3A. CASO A: Modelo cargado correctamente
          if (modelLoaded)
          {
-            model.MarkAsNoLongerNeeded();
-
-            // 3.1 Limpiar el garaje nativo (si existe un vehículo base)
+            // 3A.1 Buscamos si ya existe un vehículo duplicado (mismo modelo+placa) a menos de 600m
+            string searchKey = VehicleKey.ModelPlateKeyFrom(data);
             Vector3 garagePos = new Vector3(data.PosX, data.PosY, data.PosZ);
             Vehicle garageVehicle = World.GetClosestVehicle(garagePos, Constants.GARAGE_SEARCH_RADIUS);
-            if (garageVehicle != null && garageVehicle.Exists() && VehiclesInGarage.IsDefaultGarage(garageVehicle))
-            {
-               Function.Call(Hash.SET_VEHICLE_CAN_SAVE_IN_GARAGE, garageVehicle, false);
-               garageVehicle.Delete();
-            }
-
-            // 3.2 Buscar si ya existe un vehículo duplicado (mismo modelo+placa) a menos de 600m
-            string searchKey = VehicleKey.ModelPlateKeyFrom(data);
             Vector3 playerPos = Game.Player.Character.Position;
             Vehicle duplicateVehicle = World.GetAllVehicles()
                .FirstOrDefault(v => v.Exists()
                   && v != garageVehicle
-                  && $"{v.Model}_{v.Mods.LicensePlate}" == searchKey
+                  && $"{Function.Call<string>(Hash.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL, v.Model.Hash)}_{v.Mods.LicensePlate}" == searchKey
                   && v.Position.DistanceTo(playerPos) < Constants.DORMANCY_THRESHOLD);
 
-            // 3.3 Si hay duplicado, lo adoptamos y actualizamos la BD
+            // 3A.2 Si hay duplicado, NO lo adoptamos, solo eliminamos el garageVehicle (si es nativo) y salimos.
             if (duplicateVehicle != null && duplicateVehicle.Exists())
             {
                Logger.Warning($"Vehículo duplicado detectado (KeyPair: {searchKey}) a " +
-                  $"<{Constants.DORMANCY_THRESHOLD}m. Se usará ese en lugar de spawnear.");
-               insuredVehList.Add(duplicateVehicle);
+                   $"<{Constants.DORMANCY_THRESHOLD}m. Se eliminará el coche base del garaje nativo.");
 
-               var blipResult = VehicleBlipHandler.Create(duplicateVehicle);
-               if (blipResult is Ok<Blip> okBlip) blipsToRemove[data.Id] = okBlip.Value;
+               // Eliminar garageVehicle si existe, es válido y es un garaje nativo
+               if (garageVehicle != null && garageVehicle.Exists() && VehiclesInGarage.IsDefaultGarage(garageVehicle)) {
+                  Function.Call(Hash.SET_VEHICLE_CAN_SAVE_IN_GARAGE, garageVehicle, false);
+                  garageVehicle.MarkAsNoLongerNeeded();
+                  garageVehicle.Delete();
+               }
 
-               var updatedData = data.With(d =>
-               {
-                  d.PosX = duplicateVehicle.Position.X;
-                  d.PosY = duplicateVehicle.Position.Y;
-                  d.PosZ = duplicateVehicle.Position.Z;
-                  d.Heading = duplicateVehicle.Heading;
-                  d.IsInGarage = false;
-               });
-               DB.Core.Update(updatedData);
-               return; // Todo listo, no spawnear nuevo
+               // No se añade el duplicado a insuredVehList, no se crea blip, no se actualiza BD.
+               // VehicleMonitor se encargará de detectarlo automáticamente.
+               model.MarkAsNoLongerNeeded();
+               return;
             }
 
-            // 3.4 No hay duplicado → spawnear el vehículo desde la BD
-            var spawnResult = VehicleSpawnManager.SpawnVehicle(data);
-            spawnResult.match<bool>(
-               onOk: spawned =>
+            // 3A.3 No hay duplicado → verificar coincidencia de garageVehicle
+            if (garageVehicle != null && garageVehicle.Exists() && VehiclesInGarage.IsDefaultGarage(garageVehicle))
+            {
+               string garageModel = Function.Call<string>(Hash.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL, garageVehicle.Model.Hash);
+               string garagePlate = garageVehicle.Mods.LicensePlate;
+               if (garageModel == data.ModelName && garagePlate == data.Plate)
                {
-                  insuredVehList.Add(spawned);
-                  var blipResult = VehicleBlipHandler.Create(spawned);
-                  if (blipResult is Ok<Blip> okBlip)
-                     blipsToRemove[data.Id] = okBlip.Value;
-                  return true;
-               },
-               onErr: error =>
-               {
-                  Logger.Error($"Error al restaurar vehículo {data.ModelName}: {error}");
-                  return false;
+                  // Coincide: eliminar el coche base y spawnear el nuestro
+                  Function.Call(Hash.SET_VEHICLE_CAN_SAVE_IN_GARAGE, garageVehicle, false);
+                  garageVehicle.MarkAsNoLongerNeeded();
+                  garageVehicle.Delete();
+
+                  var spawnResult = VehicleSpawnManager.SpawnVehicle(data);
+                  spawnResult.match<bool>(
+                      onOk: spawned => {
+                         insuredVehList.Add(spawned);
+                         var blipResult = VehicleBlipHandler.Create(spawned);
+                         if (blipResult is Ok<Blip> okBlip) blipsToRemove[data.Id] = okBlip.Value;
+                         return true;
+                      },
+                      onErr: error => {
+                         Logger.Error($"Error al restaurar vehículo {data.ModelName}: {error}");
+                         return false;
+                      }
+                  );
                }
-            );
+               // Si no coincide, no se hace nada (no eliminar, no spawnear)
+            }
+            model.MarkAsNoLongerNeeded();
             return;
          }
 
-         // 4. CASO B: Modelo NO cargado (fallback)
+         // 3B. CASO B: Modelo NO cargado (fallback)
          model.MarkAsNoLongerNeeded();
-         Logger.Warning($"No se pudo cargar el modelo {data.ModelName} - {data.Plate}. Se mantiene el vehículo original.");
-
          Vector3 fallbackPos = new Vector3(data.PosX, data.PosY, data.PosZ);
-         Vehicle existingVehicle = World.GetClosestVehicle(fallbackPos, Constants.GARAGE_SEARCH_RADIUS);
-         if (existingVehicle != null && existingVehicle.Exists())
-         {
+         Vehicle existingVehicle = World.GetAllVehicles()
+             .FirstOrDefault(v => v.Exists()
+                 && Function.Call<string>(Hash.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL, v.Model.Hash) == data.ModelName
+                 && v.Mods.LicensePlate == data.Plate
+                 && v.Position.DistanceTo(fallbackPos) <= Constants.GARAGE_SEARCH_RADIUS);
+
+         if (existingVehicle != null && existingVehicle.Exists()) {
             insuredVehList.Add(existingVehicle);
             var blipResult = VehicleBlipHandler.Create(existingVehicle);
             if (blipResult is Ok<Blip> okBlip) blipsToRemove[data.Id] = okBlip.Value;
+         }
+         else {
+            Logger.Warning($"No se pudo cargar el modelo {data.ModelName} - {data.Plate}. Se mantiene el vehículo original.");
          }
       }
    }

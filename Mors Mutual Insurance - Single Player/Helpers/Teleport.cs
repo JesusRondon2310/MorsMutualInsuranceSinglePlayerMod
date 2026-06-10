@@ -25,7 +25,7 @@ namespace MMI_SP.Helpers.Teleport
 			Vector3 finalPos = roadResult.unwrap_or(candidatePos);
 
 			veh.Position = finalPos;
-			veh.Heading = Game.Player.Character.Heading;
+			veh.Heading = GameplayCamera.Rotation.Z;
 		}
 
 		// Teletransporta el vehículo delante del jugador (sin validación de carretera)

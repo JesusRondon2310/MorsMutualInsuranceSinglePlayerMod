@@ -43,16 +43,8 @@ namespace MMI_SP.Insurance.Observer
                 return;
             }
 
-            // 5. Verificar si el vehículo está en el depósito policial
+            // 5. Verificar posición actual en BD (si es válida)
             Vector3 lastPos = new Vector3(data.PosX, data.PosY, data.PosZ);
-            if (VehiclesInGarage.IsPositionInPoliceImpound(lastPos))
-            {
-                // Marcar como en garaje y eliminar de la lista
-                var updatedData = data.With(d => { d.IsInGarage = true; d.IsDormant = false; });
-                DB.Core.Update(updatedData);
-                insuredVehList.RemoveAt(i);
-                return;
-            }
 
             // 6. Determinar si es un vehículo recién recuperado
             string recoveryKey = VehicleKey.FullKeyFrom(data);

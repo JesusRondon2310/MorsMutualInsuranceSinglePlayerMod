@@ -70,8 +70,9 @@ namespace MMI_SP.Helpers.Spawn.Coordinates
 
       public static Vector3 DriverDeliverySpawn(float distanceBehindPlayer)
       {
-         Vector3 playerPos = Game.Player.Character.Position;
-         return playerPos - (Game.Player.Character.ForwardVector * distanceBehindPlayer);
+         Vector3 camPos = GameplayCamera.Position;
+         Vector3 camForward = GameplayCamera.Direction;
+         return camPos - (camForward * distanceBehindPlayer);
       }
 
       public static EntityPosition InstantDeliverySpawn(Vector3 playerPos)

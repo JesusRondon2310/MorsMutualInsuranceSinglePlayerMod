@@ -33,7 +33,8 @@ namespace MMI_SP.Helpers
                 plateStyle: updater.PlateStyle ?? original.PlateStyle,
                 customTires: updater.CustomTires ?? original.CustomTires,
                 isDormant: updater.IsDormant ?? original.IsDormant,
-                isInGarage: updater.IsInGarage ?? original.IsInGarage,
+                isInNativeGarage: updater.IsInNativeGarage ?? original.IsInNativeGarage,
+                isInInteriorGarage: updater.IsInInteriorGarage ?? original.IsInInteriorGarage,
                 vehicleType: updater.VehicleType ?? original.VehicleType
             );
         }
@@ -60,7 +61,8 @@ namespace MMI_SP.Helpers
             public int? PlateStyle { get; set; }
             public bool? CustomTires { get; set; }
             public bool? IsDormant { get; set; }
-            public bool? IsInGarage { get; set; }
+            public bool? IsInNativeGarage { get; set; }
+            public bool? IsInInteriorGarage { get; set; }
             public string VehicleType { get; set; }
             public bool? IsDestroyed { get; set; }
             public VehicleDataUpdate(VehicleData original) { }

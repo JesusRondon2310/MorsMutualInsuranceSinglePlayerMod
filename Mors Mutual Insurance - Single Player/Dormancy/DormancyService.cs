@@ -43,8 +43,12 @@ namespace MMI_SP.Dormancy
                 onSome: data => {
                     if (IsAlreadyDormant(data)) return new Err<bool>("El vehículo ya está en estado dormante.");
 
-                    var dormantData = data.With(d => { d.IsDormant = true; d.IsInGarage = false; });
-                    DB.Core.Update(dormantData);
+                   var dormantData = data.With(d => {
+                      d.IsDormant = true;
+                      d.IsInNativeGarage = false;
+                      d.IsInInteriorGarage = false;
+                   });
+                   DB.Core.Update(dormantData);
 
                     var dormant = new DormantVehicle { Data = dormantData };
                     DormantVehicles.Add(dormant);
