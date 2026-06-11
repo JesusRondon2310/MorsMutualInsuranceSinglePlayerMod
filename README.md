@@ -44,6 +44,8 @@ Con las últimas versiones de las dependencias importantes instaladas y actualiz
 
 Copian todo lo que está dentro del `.zip` y lo pegan en su carpeta `/scripts` dentro de su carpeta raíz de GTA V.
 
+---
+
 ## Aja, y… ¿Qué cambió? 🤔
 
 ### 🔧 Mejoras técnicas (código fuente)
@@ -74,6 +76,14 @@ Copian todo lo que está dentro del `.zip` y lo pegan en su carpeta `/scripts` d
 - **Configuración desde el móvil:** Ajusta precios, opciones de persistencia y más directamente desde el teléfono del juego, sin salir de la partida.<br><br>
 
 - **Persistencia real de los vehículos:** Los coches tuneados no desaparecen al cambiar de misión ni se duplican. Su estado (daños, mejoras, ubicación) se guarda de forma consistente.
+
+---
+
+## 🚀 Optimización Extrema & Control de Calidad Indestructible
+
+- Apto para "Tostadoras" (Canaima Friendly): El mod está optimizado línea por línea. Fue diseñado pensando en escenarios extremos: PCs de muy bajos recursos corriendo el juego con 100 mods encima a 15 FPS. Si tu PC apenas puede con el juego, este script no le quitará ni un solo cuadro por segundo gracias a su sistema inteligente de dormancia.<br><br>
+
+- Sello de Calidad "Anti-Niños": El control de calidad (QA) principal estuvo a cargo de mi hermano de 11 años. Su único trabajo fue jugar al caos absoluto, destruir vehículos de mil formas creativas, romper misiones y forzar el juego al límite. Si un niño de 11 años no pudo corromper la base de datos ni romper el sistema de seguros, ten por seguro que tu partida está 100% a salvo.
 
 ---
 
