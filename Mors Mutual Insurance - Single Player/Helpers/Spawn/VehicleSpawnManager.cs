@@ -1,7 +1,6 @@
 ﻿using GTA;
 using GTA.Math;
 using MMI_SP.DB;
-using MMI_SP.Helpers;
 using MMI_SP.Helpers.Spawn.Coordinates;
 using MMI_SP.PatternMatching;
 
@@ -58,12 +57,10 @@ namespace MMI_SP.Helpers.Spawn
         // Spawn para vehículos persistentes (garajes, restauración)
         public static Result<Vehicle> SpawnVehicle(VehicleData data, bool adjustToRoadNode = true)
         {
-            if (data == null)
-                return new Err<Vehicle>("Datos del vehículo no válidos.");
+            if (data == null) return new Err<Vehicle>("Datos del vehículo no válidos.");
 
             var loadResult = LoadModel(data.ModelName, Constants.SHORT_TIMEOUT_MS, retryOnce: false);
-            if (loadResult.is_err())
-                return new Err<Vehicle>(((Err<Model>)loadResult).Message);
+            if (loadResult.is_err()) return new Err<Vehicle>(((Err<Model>)loadResult).Message);
 
             Model model = ((Ok<Model>)loadResult).Value;
             var (spawnPos, heading) = ResolveSpawnPosition(data, adjustToRoadNode);
@@ -74,8 +71,7 @@ namespace MMI_SP.Helpers.Spawn
             Vehicle veh = ((Ok<Vehicle>)createResult).Value;
             VehicleCustomizer.ApplyAll(veh, data);
 
-            if (data.IsLocked)
-            {
+            if (data.IsLocked) {
                 veh.LockStatus = VehicleLockStatus.CannotEnter;
                 veh.IsAlarmSet = true;
             }
@@ -89,12 +85,10 @@ namespace MMI_SP.Helpers.Spawn
         // Spawn para entregas temporales (recuperación, mecánico)
         public static Result<Vehicle> SpawnVehicleForDelivery(VehicleData data, bool adjustToRoadNode = true)
         {
-            if (data == null)
-                return new Err<Vehicle>("Datos del vehículo no válidos.");
+            if (data == null) return new Err<Vehicle>("Datos del vehículo no válidos.");
 
             var loadResult = LoadModel(data.ModelName, Constants.LONG_TIMEOUT_MS, retryOnce: true);
-            if (loadResult.is_err())
-                return new Err<Vehicle>(((Err<Model>)loadResult).Message);
+            if (loadResult.is_err()) return new Err<Vehicle>(((Err<Model>)loadResult).Message);
 
             Model model = ((Ok<Model>)loadResult).Value;
             var (spawnPos, heading) = ResolveSpawnPosition(data, adjustToRoadNode);
@@ -105,8 +99,7 @@ namespace MMI_SP.Helpers.Spawn
             Vehicle veh = ((Ok<Vehicle>)createResult).Value;
             VehicleCustomizer.ApplyAll(veh, data);
 
-            if (data.IsLocked)
-                veh.LockStatus = VehicleLockStatus.CannotEnter;
+            if (data.IsLocked) veh.LockStatus = VehicleLockStatus.CannotEnter;
 
             VehiclePersistence.SetPersistence(veh, true);
 

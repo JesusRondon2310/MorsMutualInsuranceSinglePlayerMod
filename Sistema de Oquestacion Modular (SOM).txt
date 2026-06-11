@@ -1,6 +1,6 @@
 ================================================================================
 SISTEMA DE ORQUESTACIÓN MODULAR (SOM)
-Documentación completa y actualizada
+Documentación completa y actualizada (versión genérica para C#)
 ================================================================================
 
 ## INDICE
@@ -12,7 +12,7 @@ Documentación completa y actualizada
 5. Reglas de encapsulamiento y acceso
 6. Convenciones de código
 7. Excepciones controladas (el 20% mutable)
-8. Ejemplo práctico: estructura de MMI-SP
+8. Ejemplo práctico: estructura de una aplicación modular
 9. Comparación con otros patrones
 10. Origen y filosofía
 
@@ -28,7 +28,9 @@ todo su funcionamiento interno oculto al resto de la aplicación.
 Nació de la adaptación del sistema de módulos de Rust a C#, y es aplicable a
 cualquier lenguaje que permita distinguir entre código público y privado.
 
-# ================================================================================ 2. PRINCIPIOS FUNDAMENTALES
+# ================================================================================
+2. PRINCIPIOS FUNDAMENTALES
+# ================================================================================
 
 ## 2.1. Un orquestador por módulo
 
@@ -64,36 +66,43 @@ dónde falló algo.
 
 ## 2.5. Independencia entre módulos
 
-Los módulos no se acoplan entre sí. Si Insurance falla, Agency no se entera.
-Si Agency necesita algo de Insurance, lo pide a través de su orquestador
-público.
+Los módulos no se acoplan entre sí. Si un módulo falla, otro no se entera.
+Si un módulo necesita algo de otro, lo pide a través de su orquestador público.
 
-## 2.6. Delegación de entrada (teclado / mando)
+## 2.6. Delegación de entrada (UI / controladores)
 
 El orquestador principal (Core, Manager o Handler) **no debe contener lógica
-de detección de entrada** (teclas, botones del mando, etc.). Esa lógica debe
-delegarse en mini-orquestadores especializados (por ejemplo, LockVehicle.Handler,
-InputHandler) o en componentes internos específicos. El orquestador solo
-invoca métodos de sus mini-orquestadores; nunca realiza comprobaciones de
-entrada directamente.
+de detección de entrada** (eventos de teclado, ratón, etc.). Esa lógica debe
+delegarse en mini-orquestadores especializados (por ejemplo, InputHandler) o
+en componentes internos específicos. El orquestador solo invoca métodos de sus
+mini-orquestadores; nunca realiza comprobaciones de entrada directamente.
 
-# ================================================================================ 3. NIVELES DE PROFUNDIDAD Y NOMENCLATURA DE ARCHIVOS
+# ================================================================================
+3. NIVELES DE PROFUNDIDAD Y NOMENCLATURA DE ARCHIVOS
+# ================================================================================
 
 Los módulos se organizan en carpetas con un máximo de 3 niveles de profundidad
 desde la raíz del proyecto.
 
 Cada nivel tiene un nombre de archivo específico para su orquestador:
 
-Nivel 1: Core.cs - Es el orquestador principal del módulo de primer nivel. - Ejemplo: Insurance/Core.cs
+Nivel 1: Core.cs - Es el orquestador principal del módulo de primer nivel.
+         Ejemplo: `Inventory/Core.cs`
 
-Nivel 2: Manager.cs - Es el orquestador del submódulo de segundo nivel. - Coordina un conjunto de funcionalidades relacionadas. - Ejemplo: Insurance/Observer/Manager.cs
+Nivel 2: Manager.cs - Es el orquestador del submódulo de segundo nivel.
+         Coordina un conjunto de funcionalidades relacionadas.
+         Ejemplo: `Inventory/Transaction/Manager.cs`
 
-Nivel 3: Handler.cs - Es el orquestador del submódulo de tercer nivel. - Contiene la lógica de negocio específica y coordina componentes internos. - Ejemplo: Insurance/Observer/Delivery/Handler.cs
+Nivel 3: Handler.cs - Es el orquestador del submódulo de tercer nivel.
+         Contiene la lógica de negocio específica y coordina componentes internos.
+         Ejemplo: `Inventory/Transaction/Validation/Handler.cs`
 
 Los archivos que no son orquestadores se nombran según su responsabilidad
-específica (VehicleMonitor.cs, BlipManager.cs, etc.).
+específica (ItemValidator.cs, PriceCalculator.cs, etc.).
 
-# ================================================================================ 4. ROLES DE LOS ARCHIVOS
+# ================================================================================
+4. ROLES DE LOS ARCHIVOS
+# ================================================================================
 
 ## 4.1. Orquestador principal del módulo
 
@@ -107,7 +116,7 @@ específica (VehicleMonitor.cs, BlipManager.cs, etc.).
 - Contiene lógica de negocio específica.
 - Coordina otros componentes internos.
 - Depende del orquestador principal de su módulo.
-- Nomenclatura: NombreEspecificoHandler.cs (ej: NpcHandler.cs).
+- Nomenclatura: NombreEspecificoHandler.cs (ej: PriceCalculatorHandler.cs).
 - **Visibilidad:** 
   - Si solo es utilizado dentro de su propio módulo → `internal`.
   - Si debe ser accedido desde otros módulos (por ejemplo, para ser invocado por
@@ -122,9 +131,11 @@ específica (VehicleMonitor.cs, BlipManager.cs, etc.).
 - **Visibilidad:** `internal` por defecto.
 - **Excepción:** Los helpers de uso general ubicados en la carpeta `Helpers/`
   deben ser `public static` para permitir su reutilización desde cualquier módulo
-  del proyecto (ejemplos: Timers.cs, VehicleKey.cs, InputHandler.cs).
+  del proyecto (ejemplos: Timers.cs, StringHelper.cs, MathUtils.cs).
 
-# ================================================================================ 5. REGLAS DE ENCAPSULAMIENTO Y ACCESO
+# ================================================================================
+5. REGLAS DE ENCAPSULAMIENTO Y ACCESO
+# ================================================================================
 
 ## 5.1. Visibilidad
 
@@ -144,7 +155,9 @@ específica (VehicleMonitor.cs, BlipManager.cs, etc.).
 - Un módulo solo accede al orquestador público de otro módulo.
 - Nunca accede directamente a sus internos.
 
-# ================================================================================ 6. CONVENCIONES DE CÓDIGO
+# ================================================================================
+6. CONVENCIONES DE CÓDIGO COMO RECOMENDACIONES
+# ================================================================================
 
 ## 6.1. Nombres de archivos y clases
 
@@ -170,97 +183,93 @@ específica (VehicleMonitor.cs, BlipManager.cs, etc.).
 - Se evita la duplicación de código (DRY) siempre que no fuerce una
   abstracción innecesaria.
 
-# ================================================================================ 7. EXCEPCIONES CONTROLADAS (EL 20% MUTABLE)
+# ================================================================================
+7. EXCEPCIONES CONTROLADAS (EL 20% MUTABLE)
+# ================================================================================
 
 ## 7.1. El cascarón POO
 
-- Los módulos que interactúan con APIs externas mutables (NativeUI, SHVDN3)
+- Los módulos que interactúan con APIs externas mutables (UI, hardware, servicios)
   pueden mantener estado mutable interno.
-- Esto incluye referencias a UIMenu, MenuPool, y suscripciones a eventos.
+- Esto incluye referencias a manejadores de ventanas, colas de eventos, conexiones.
 - Estos módulos representan el 20% del código total.
 
 ## 7.2. ¿Cuándo se permite?
 
-- Solo en los módulos de UI (Agency/MainMenu, Agency/Office).
-- En los Observers que heredan de Script y manejan eventos del juego.
-- En helpers que encapsulan llamadas a natives de GTA V.
+- Solo en los módulos de interfaz de usuario (UI) o de integración con librerías
+  que requieran estado mutable.
+- En los observadores que heredan de eventos y manejan callbacks asíncronos.
+- En helpers que encapsulan llamadas a sistemas externos (archivos, red, etc.).
 
 ## 7.3. ¿Cuándo NO se permite?
 
-- En el motor funcional (80% del código): Insurance, cálculos, validaciones.
-- En objetos de dominio (VehicleData, etc.): deben ser inmutables.
+- En el motor funcional (80% del código): reglas de negocio, cálculos, validaciones.
+- En objetos de dominio (entidades, DTOs): deben ser inmutables.
 
-## 7.4. Uso controlado del objeto `Vehicle` mutable
+## 7.4. Uso controlado de objetos mutables externos
 
-Aunque el sistema evita depender del objeto `Vehicle` mutable (parte del 20%),
-existen **dos casos legítimos** donde se permite su uso directo:
+Aunque el sistema evita depender de objetos mutables externos (parte del 20%),
+existen **casos legítimos** donde se permite su uso directo:
 
-- **`VehicleDataBuilder.CreateFrom(Vehicle veh)`**: al asegurar un vehículo por
-  primera vez, el coche está vivo y sus propiedades (placa, modelo, etc.) son
-  fiables para construir el registro inmutable.
-- **`CheckForInsuredVehicles`**: durante la detección de vehículos en el mundo,
-  el Observer consulta `veh.Mods.LicensePlate` y `veh.Model` para compararlos
-  con la base de datos inmutable.
+- **`DataBuilder.CreateFrom(ExternalObject obj)`**: al construir entidades
+  desde fuentes externas, el objeto está vivo y sus propiedades son fiables
+  para construir el registro inmutable.
+- **`Observer.CheckForExistingEntities`**: durante la detección de entidades
+  en el sistema externo, se consultan propiedades comparándolas con la base
+  de datos inmutable.
 
-En cualquier otro contexto, debe consultarse la base de datos inmutable
-(`VehicleData`) en lugar del objeto `Vehicle` vivo.
+En cualquier otro contexto, debe consultarse la base de datos inmutable en
+lugar del objeto externo vivo.
 
-## 7.5. Flags mutuamente excluyentes en `VehicleData`
+## 7.5. Flags mutuamente excluyentes en entidades
 
-Los objetos `VehicleData` (inmutables en su mayoría, pero con estado de ciclo
-de vida) deben mantener consistencia entre sus flags. Las siguientes parejas
-nunca pueden ser `true` simultáneamente:
+Las entidades (inmutables en su mayoría, pero con estado de ciclo de vida)
+deben mantener consistencia entre sus flags. Las siguientes parejas nunca
+pueden ser `true` simultáneamente:
 
-- `IsDestroyed` y `IsInGarage` → mutuamente excluyentes.
-- `IsDormant` y `IsInGarage` → mutuamente excluyentes.
-- `IsLocked` y `IsInGarage` → mutuamente excluyentes.
+- `IsDeleted` y `IsArchived`
+- `IsPending` y `IsConfirmed`
+- `IsLocked` y `IsAvailable`
 
-**Regla:** Al modificar un flag de estado (ej. `MarkAsDestroyed`, `HandleGarage`,
-`SetDormant`), los métodos responsables deben revisar los flags relacionados y
-forzarlos a valores coherentes. Esta responsabilidad recae en los
-mini-orquestadores o componentes internos que modifican la base de datos.
+**Regla:** Al modificar un flag de estado, los métodos responsables deben
+revisar los flags relacionados y forzarlos a valores coherentes. Esta
+responsabilidad recae en los mini-orquestadores o componentes internos que
+modifican la base de datos.
 
-# ================================================================================ 8. EJEMPLO PRÁCTICO: ESTRUCTURA DE MMI-SP
+# ================================================================================
+8. EJEMPLO PRÁCTICO: ESTRUCTURA DE UNA APLICACIÓN MODULAR
+# ================================================================================
 
-Agency/ ← Nivel 1 (Encapsulador)
-├── Core.cs (orquestador público)
-├── Office/ ← Nivel 2 (Encapsulador)
-│ ├── Manager.cs (orquestador)
-│ ├── Ambient/ ← Nivel 3 (Encapsulador)
-│ │ ├── Handler.cs (orquestador nivel 3)
-│ │ └── NpcHandler.cs (mini-orquestador)
-│ ├── Entry/ ← Nivel 3 (Encapsulador)
-│ └── Handler.cs (orquestador nivel 3)
-├── MainMenu/ ← Nivel 2 (Encapsulador)
-│ ├── Manager.cs (orquestador nivel 2)
-│ ├── SubMenus/ ← Nivel 3 (Encapsulador)
-│ ├── CancelHandler.cs (mini-orquestador)
-│ └── (futuro: RecoverHandler.cs)
-├── Buttons/ ← Nivel 2 (Encapsulador)
-├── Build.cs (interno)
-└── Fill.cs (interno)
+MyApp/
+├── Core/                      ← Nivel 1 (Encapsulador)
+│   ├── Core.cs (orquestador público)
+│   ├── Data/                  ← Nivel 2 (Encapsulador)
+│   │   ├── Manager.cs (orquestador)
+│   │   ├── Readers/           ← Nivel 3 (Encapsulador)
+│   │   │   ├── Handler.cs (orquestador nivel 3)
+│   │   │   └── CsvReaderHandler.cs (mini-orquestador solo permitido a partir del nivel 3)
+│   │   ├── Writers/           ← Nivel 3 (Encapsulador)
+│   │   └── Validators.cs
+│   ├── Calculations/          ← Nivel 2 (Encapsulador)
+│   │   ├── Manager.cs (orquestador)
+│   │   ├── Formulas/          ← Nivel 3 (Encapsulador)
+│   │   │   ├── Handler.cs
+│   │   │   └── TaxHandler.cs
+│   │   └── Helpers.cs
+│   └── UI/                    ← Nivel 2 (Encapsulador)
+│       ├── Manager.cs (orquestador nivel 2)
+│       ├── Windows/           ← Nivel 3 (Encapsulador)
+│       ├── Buttons/           ← Nivel 2 (Encapsulador)
+│       ├── Build.cs (interno)
+│       └── Fill.cs (interno)
+└── Helpers/                   ← Helpers globales (public static)
+    ├── Timers.cs
+    ├── MathHelper.cs
+    └── StringHelper.cs
 
-Insurance/ ← Nivel 1 (Encapsulador)
-├── Core.cs (orquestador público)
-├── Manager/ ← Nivel 2 (Encapsulador)
-│ ├── Manager.cs (orquestador nivel 2)
-│ ├── Insurer.cs (interno)
-│ ├── Calculator.cs (interno)
-│ └── Repository.cs (interno)
-└── Observer/ ← Nivel 2 (Encapsulador)
-├── Manager.cs (orquestador nivel 2)
-├── VehicleMonitor.cs (mini-orquestador)
-├── RecoveryManager.cs (mini-orquestador)
-├── BlipManager.cs (interno)
-├── PersistenceManager.cs (interno)
-│ ├── Delivery/ ← Nivel 3 (Encapsulador)
-│ ├── Handler.cs (orquestador nivel 3)
-│ ├── Tracking.cs (interno)
-│ ├── EntityPosition.cs (interno)
-│ └── DeliveryHelpers.cs (interno)
-└──
-
-# ================================================================================ 9. COMPARACIÓN CON OTROS PATRONES
+# ================================================================================
+9. COMPARACIÓN CON OTROS PATRONES
+# ================================================================================
 
 | Patrón             | Tamaño archivos        | Encapsulamiento | Trazabilidad | Curva aprendizaje |
 | ------------------ | ---------------------- | --------------- | ------------ | ----------------- |
@@ -270,7 +279,9 @@ Insurance/ ← Nivel 1 (Encapsulador)
 | Event-driven       | Pequeños               | Muy alto        | Muy baja     | Alta              |
 | Clean Architecture | Pequeños/medianos      | Muy alto        | Baja         | Muy alta          |
 
-# ================================================================================ 10. ORIGEN Y FILOSOFÍA
+# ================================================================================
+10. ORIGEN Y FILOSOFÍA
+# ================================================================================
 
 SOM nace de la adaptación del sistema de módulos de Rust a C#. En Rust, cada
 archivo es un módulo, todo es privado por defecto, y solo lo marcado con 'pub'
@@ -280,11 +291,6 @@ orquestadores.
 
 "Si Rust puede tener módulos limpios y encapsulados sin herencia ni interfaces
 innecesarias, C# también puede."
-
-"SOM fue concebido durante la migración de MMI-SP a SHVDN3, tras 48 horas
-combatiendo un bug de renderizado en NativeUI y bajo la influencia del sistema
-de módulos de Rust. Lo que empezó como una solución desesperada acabó siendo un
-patrón arquitectónico."
 
 **Nota:** SOM está concebido para trabajar en armonía con la programación funcional.
 Aunque permite un 20% de código mutable para interactuar con APIs externas,

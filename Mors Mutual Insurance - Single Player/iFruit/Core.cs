@@ -6,7 +6,7 @@ namespace MMI_SP.iFruit
     public class Core : Script
     {
         internal static Core Instance { get; private set; }
-        private PhoneService _phoneService;
+        private UI _phoneService;
         public static bool MechanicDeliveryRequested {
             get => Instance?._phoneService?.MechanicDeliveryRequested ?? false;
             set { if (Instance?._phoneService != null) Instance._phoneService.MechanicDeliveryRequested = value; }
@@ -14,7 +14,7 @@ namespace MMI_SP.iFruit
 
         public Core() {
             Instance = this;
-            _phoneService = new PhoneService();
+            _phoneService = new UI();
             Tick += Initialize;
             Aborted += OnAborted;
         }

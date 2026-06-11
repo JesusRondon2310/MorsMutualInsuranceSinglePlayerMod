@@ -115,7 +115,7 @@
     <Compile Include="DB\Core.cs" />
     <Compile Include="Dormancy\Core.cs" />
     <Compile Include="Dormancy\DespawnHandler.cs" />
-    <Compile Include="Dormancy\DormancyService.cs" />
+    <Compile Include="Dormancy\DormancyLifeCycle.cs" />
     <Compile Include="Dormancy\RespawnHandler.cs" />
     <Compile Include="Helpers\Blips\BlipCleanupHandler.cs" />
     <Compile Include="Helpers\Blips\RecoverBlipHandler.cs" />
@@ -144,7 +144,7 @@
     <Compile Include="iFruit\MMI\MMIMenu.cs" />
     <Compile Include="iFruit\MMI\MMIMenuBuilder.cs" />
     <Compile Include="iFruit\MMI\MMISound.cs" />
-    <Compile Include="iFruit\PhoneService.cs" />
+    <Compile Include="iFruit\UI.cs" />
     <Compile Include="Insurance\Delivery\Completion.cs" />
     <Compile Include="Debug\Logger.cs" />
     <Compile Include="Agency\Office\Ambient\Handler.cs" />

@@ -7,7 +7,7 @@ using MMI_SP.PatternMatching;
 
 namespace MMI_SP.Dormancy
 {
-    internal static class DormancyService
+    internal static class DormancyLifeCycle
     {
         // ==========================================
         // BLOQUE 1: Datos
@@ -47,6 +47,8 @@ namespace MMI_SP.Dormancy
                       d.IsDormant = true;
                       d.IsInNativeGarage = false;
                       d.IsInInteriorGarage = false;
+                      d.IsLocked = false;
+                      d.IsDestroyed = false;
                    });
                    DB.Core.Update(dormantData);
 

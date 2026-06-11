@@ -11,7 +11,7 @@ using System;
 
 namespace MMI_SP.iFruit
 {
-    internal class PhoneService
+    internal class UI
     {
         private readonly CustomiFruit _iFruit;
         private MMIMenu _menu;
@@ -21,7 +21,7 @@ namespace MMI_SP.iFruit
         private bool _wasMechanicMenuVisible;
         internal bool MechanicDeliveryRequested = false;
 
-        public PhoneService()
+        public UI()
         {
             _iFruit = new CustomiFruit();
         }

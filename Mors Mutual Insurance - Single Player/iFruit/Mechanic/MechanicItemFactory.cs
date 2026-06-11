@@ -60,17 +60,16 @@ namespace MMI_SP.iFruit
             {
                 var spawnResult = Dormancy.Core.Respawn(vehId);
                 spawnResult.match<Vehicle>(
-                    onOk: spawned =>
-                    {
+                    onOk: spawned => {
                         Teleport.BehindPlayer(spawned);
                         Manager.RequestDelivery(spawned, cost, false, true, Insurance.Observer.Manager.BlipsToRemove);
                         Notification.ShowMechanic("Mecánico", "Marchando. Voy para allá, no te muevas.");
                         MechanicSound.Play(MechanicSound.SoundFamily.Confirm);
                         return spawned;
                     },
-                    onErr: error =>
-                    {
+                    onErr: error => {
                         Notification.ShowMechanic("Mecánico", "Bro, no pude llevar tu auto, bro, lo estrellé.");
+                        Game.Player.Money += cost;
                         return null;
                     }
                 );

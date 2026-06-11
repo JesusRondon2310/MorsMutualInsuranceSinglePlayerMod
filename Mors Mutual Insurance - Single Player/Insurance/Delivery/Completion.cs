@@ -52,34 +52,26 @@ namespace MMI_SP.Insurance.Delivery
         // ==========================================
         // BLOQUE: Fallo en la entrega
         // ==========================================
-        internal static void Execute(Data incoming, int refund, List<Data> incomingVehicles)
-        {
+        internal static void Execute(Data incoming, int refund, List<Data> incomingVehicles) {
             NotifyFailure();
             Refund(incoming, refund);
             incoming.driver.Delete();
             RepairIfAlive(incoming);
-            // ELIMINADO: incomingVehicles.Remove(incoming);
-            // La gestión de la lista es responsabilidad exclusiva del llamador (TrackVehicleState)
         }
 
-        private static void NotifyFailure() => Notification.ShowMechanic("Información", "No se pudo traer el vehículo.");
+        private static void NotifyFailure() => Notification.ShowMechanic("Mecánico", "Bro, no pude llevar tu auto, bro, lo estrellé.");
 
-        private static void Refund(Data incoming, int refund)
-        {
-            Game.Player.Money += (refund == Constants.NONE) ? incoming.price : refund + incoming.price;
-        }
+        private static void Refund(Data incoming, int refund) => Game.Player.Money += (refund == Constants.NONE) ? incoming.price : refund + incoming.price;
 
         private static void RepairIfAlive(Data incoming)
         {
             if (incoming.vehicle.IsDead) return;
 
-            if (incoming.originalPosition.Position != Vector3.Zero)
-            {
+            if (incoming.originalPosition.Position != Vector3.Zero) {
                 incoming.vehicle.Position = incoming.originalPosition.Position;
                 incoming.vehicle.Heading = incoming.originalPosition.Heading;
             }
-            else
-            {
+            else {
                 EntityPosition pos = SpawnHandler.GetPlayerReferencePosition();
                 incoming.vehicle.Position = pos.Position;
                 incoming.vehicle.Heading = pos.Heading;

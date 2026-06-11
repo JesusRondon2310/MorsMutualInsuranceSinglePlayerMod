@@ -17,7 +17,7 @@ namespace MMI_SP.Helpers
 
          if (lostVehicles.Count == Constants.NONE)
          {
-            Notification.ShowiFruit("Sin novedades", "No se encontraron vehículos perdidos.");
+            Notification.ShowiFruit("Todo en orden", "¿Tenías ganas de presionar el botón o qué?");
             return;
          }
 
