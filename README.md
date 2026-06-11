@@ -69,7 +69,7 @@ Copian todo lo que está dentro del `.zip` y lo pegan en su carpeta `/scripts` d
 - **Funcionalidades clave funcionando al 100%:** A diferencia del original (cuyos comentarios reportaban fallos en la recuperación de vehículos), aquí asegurar, recuperar y que te traigan el coche funciona sin errores.<br><br>
 
 - **Conductor mensajero (mecánico) fiable:** El servicio de "tráeme mi vehículo" ahora opera correctamente.
-**Nota:** Me parece increíble que la característica principal del mod original fuera lo que menos servía y que tenga que poner esto como una mejora con respecto al original. Qué arrecho.<br><br>
+**Nota:** Me parece increíble que la característica principal del mod original fuera lo que menos servía y que tenga que poner esto como una mejora... Qué arrecho.<br><br>
 
 - **Compatibilidad garantizada:** Al eliminar las dependencias obsoletas y los conflictos con otros scripts, este mod funciona sin problemas junto a otros mods populares actuales.<br><br>
 
@@ -81,9 +81,9 @@ Copian todo lo que está dentro del `.zip` y lo pegan en su carpeta `/scripts` d
 
 ## 🚀 Optimización Extrema & Control de Calidad Indestructible
 
-- Apto para "Tostadoras" (Canaima Friendly): El mod está optimizado línea por línea. Fue diseñado pensando en escenarios extremos: PCs de muy bajos recursos corriendo el juego con 100 mods encima a 15 FPS. Si tu PC apenas puede con el juego, este script no le quitará ni un solo cuadro por segundo gracias a su sistema inteligente de dormancia.<br><br>
+- **Apto para "Tostadoras" (Canaima Friendly)**: El mod está optimizado línea por línea. Fue diseñado pensando en escenarios extremos: PCs de muy bajos recursos corriendo el juego con 100 mods encima a 15 FPS. Si tu PC apenas puede con el juego, este script no le quitará ni un solo cuadro por segundo gracias a su sistema inteligente de dormancia.<br><br>
 
-- Sello de Calidad "Anti-Niños": El control de calidad (QA) principal estuvo a cargo de mi hermano de 11 años. Su único trabajo fue jugar al caos absoluto, destruir vehículos de mil formas creativas, romper misiones y forzar el juego al límite. Si un niño de 11 años no pudo corromper la base de datos ni romper el sistema de seguros, ten por seguro que tu partida está 100% a salvo.
+- **Sello de Calidad "Anti-Niños"**: El control de calidad (QA) principal estuvo a cargo de mi hermano de 11 años. Su único trabajo fue jugar al caos absoluto, destruir vehículos de mil formas creativas, romper misiones y forzar el juego al límite. Si un niño de 11 años no pudo corromper la base de datos ni romper el sistema de seguros, ten por seguro que tus autos están 100% a salvo.
 
 ---
 
