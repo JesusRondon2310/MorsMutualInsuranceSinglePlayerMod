@@ -69,9 +69,6 @@ Copian todo lo que está dentro del `.zip` y lo pegan en su carpeta `/scripts` d
 - **Funcionalidades clave funcionando al 100%:** A diferencia del original (cuyos comentarios reportaban fallos en la recuperación de vehículos), aquí asegurar, recuperar y que te traigan el coche funciona sin errores.
 **Nota:** Me parece increíble que la característica principal del mod original fuera lo que menos servía y que tenga que poner esto como una mejora... Qué arrecho.<br><br>
 
-- **Conductor mensajero (mecánico) fiable:** El servicio de "tráeme mi vehículo" ahora opera correctamente.<br><br>
-
-
 - **Compatibilidad garantizada:** Al eliminar las dependencias obsoletas y los conflictos con otros scripts, este mod funciona sin problemas junto a otros mods populares actuales.<br><br>
 
 - **Configuración desde el móvil:** Ajusta precios, opciones de persistencia y más directamente desde el teléfono del juego, sin salir de la partida.<br><br>
