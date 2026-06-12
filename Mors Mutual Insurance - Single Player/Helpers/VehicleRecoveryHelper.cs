@@ -11,12 +11,17 @@ namespace MMI_SP.Helpers
       // ==========================================
       public static void RecoverLostVehicles()
       {
-         var lostVehicles = DB.Core.GetAll()
-            .Where(v => !v.IsDestroyed && !v.IsDormant && !v.IsInNativeGarage && !v.IsInInteriorGarage)
-            .ToList();
+         // Obtener todos los vehículos del mundo UNA SOLA VEZ (optimización)
+         var allVehicles = World.GetAllVehicles();
 
-         if (lostVehicles.Count == Constants.NONE)
-         {
+         // Vehículos candidatos: fuera de garaje O (dentro de garaje y bloqueados)
+         var lostVehicles = DB.Core.GetAll()
+             .Where(v => !v.IsDestroyed && !v.IsDormant &&
+                 ((!v.IsInNativeGarage && !v.IsInInteriorGarage) || ((v.IsInNativeGarage || v.IsInInteriorGarage) && v.IsLocked))
+                 )
+             .ToList();
+
+         if (lostVehicles.Count == Constants.NONE) {
             Notification.ShowiFruit("Todo en orden", "¿Tenías ganas de presionar el botón o qué?");
             return;
          }
@@ -26,20 +31,19 @@ namespace MMI_SP.Helpers
 
          foreach (var vd in lostVehicles)
          {
-            var matches = World.GetAllVehicles()
-               .Where(v => v.Mods.LicensePlate == vd.Plate && v.Model == new Model(vd.ModelName))
-               .ToList();
+            // Buscar coincidencias en la lista de vehículos reales (en memoria)
+            var matches = allVehicles
+                .Where(v => v.Exists() && v.Mods.LicensePlate == vd.Plate && v.Model == new Model(vd.ModelName))
+                .ToList();
 
-            if (matches.Count == Constants.NONE)
-            {
+            if (matches.Count == Constants.NONE) {
                Dormancy.Core.MarkAsDormant(vd.Id);
                recoveredCount++;
                continue;
             }
 
             int inImpound = matches.Count(v => VehiclesInGarage.IsPositionInPoliceImpound(v.Position));
-            if (inImpound > Constants.NONE)
-               impoundedCount++;
+            if (inImpound > Constants.NONE) impoundedCount++;
          }
 
          if (impoundedCount > Constants.NONE)
@@ -54,8 +58,7 @@ namespace MMI_SP.Helpers
       {
          var player = Game.Player.Character;
          var currentVeh = player.CurrentVehicle;
-         if (currentVeh == null || !currentVeh.Exists())
-         {
+         if (currentVeh == null || !currentVeh.Exists()) {
             Notification.ShowiFruit("Error", "Debes estar montado en el vehículo original.");
             return;
          }
@@ -75,8 +78,7 @@ namespace MMI_SP.Helpers
             string candidateModel = Function.Call<string>(Hash.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL, v.Model.Hash);
             string candidatePlate = v.Mods.LicensePlate;
 
-            if (candidateModel == targetModel && candidatePlate == targetPlate && v.Position.DistanceTo(playerPos) <= deleteRadius)
-            {
+            if (candidateModel == targetModel && candidatePlate == targetPlate && v.Position.DistanceTo(playerPos) <= deleteRadius) {
                // Limpieza completa
                Function.Call(Hash.SET_VEHICLE_HAS_BEEN_OWNED_BY_PLAYER, v, false);
                Function.Call(Hash.SET_VEHICLE_IS_WANTED, v, false);

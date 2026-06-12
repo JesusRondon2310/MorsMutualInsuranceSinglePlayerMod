@@ -1,8 +1,8 @@
 ================================================================================
 Mors Mutual Insurance - Single Player MOD — REGISTRO DE BUGS CORREGIDOS
 ================================================================================
-Última actualización: 2026-06-11
-Total de bugs (tras fusionar duplicados e insertar resueltos): 45
+Última actualización: 2026-06-12
+Total de bugs (tras fusionar duplicados e insertar resueltos): 46
 
 ================================================================================
 ÍNDICE POR SECCIONES
@@ -12,8 +12,8 @@ Total de bugs (tras fusionar duplicados e insertar resueltos): 45
 3.  Garajes ..................................... BUG 20,21,22,29,30
 4.  Modificaciones y accesorios ................. BUG 1,11,12,13,14
 5.  UI, notificaciones y blips .................. BUG 6,7,8,16,17,25
-6.  Otros (addons, limpieza, cancelación) ....... BUG 19,29,30,32,42,43
-7.  Bugs sin resolver (limitaciones) ............ BUG 46,47,48
+6.  Otros (addons, limpieza, cancelación) ....... BUG 19,29,30,32,42,43,46
+7.  Bugs sin resolver (limitaciones) ............ BUG 47,48,49
 ================================================================================
 
 ================================================================================
@@ -795,7 +795,38 @@ ARCHIVOS:
 ESTADO: RESUELTO
 
 ================================================================================
-BUG 46 — iFruit ScaleForm corrupto (teléfono negro durante llamadas nativas)
+BUG 46 — Vehículos bloqueados aparcados frente a la puerta del garaje nativo se marcan como dentro del garaje
+================================================================================
+SÍNTOMA:
+  El jugador aparca un vehículo asegurado y bloqueado (IsLocked = true) justo enfrente
+  de la puerta de un garaje nativo (ej. la casa de Franklin en Vinewood Hills).
+  Al recargar la partida o hacer misiones, el mod activa el flag IsInNativeGarage = true en la base de
+  datos, aunque el vehículo está físicamente fuera. Como está bloqueado, la dormancia
+  automática no lo limpia (protección). El botón "Buscar vehículos perdidos" no lo
+  detecta porque su filtro excluye vehículos con IsInNativeGarage = true.
+  El vehículo queda atrapado: no se despawnea (por estar bloqueado), no aparece en el
+  menú del mecánico (IsDormant = false), y no hay forma de recuperarlo desde el mod.
+CAUSA:
+  La detección del native IS_VEHICLE_IN_GARAGE_AREA devuelve true
+  para posiciones muy cercanas a la puerta. Un vehículo aparcado justo enfrente
+  activa el flag IsInNativeGarage = true. Además, al estar bloqueado (IsLocked = true),
+  el sistema de dormancia no lo elimina (por diseño, los vehículos bloqueados son
+  persistentes). El botón "Buscar vehículos perdidos" solo considera vehículos con
+  !IsInNativeGarage, por lo que ignora este caso.
+SOLUCIÓN:
+  Se ha modificado el filtro del botón "Buscar vehículos perdidos" (RecoverLostVehicles)
+  para que también incluya vehículos que cumplan:
+    - No destruidos y no dormantes.
+    - Estén en un garaje (nativo o interior) Y además estén bloqueados.
+  De esta forma, los vehículos atrapados se detectan y se marcan como dormantes (o se
+  cuentan en el depósito si existen físicamente). La búsqueda en el mundo se optimiza
+  ejecutando World.GetAllVehicles() una sola vez fuera del bucle.
+ARCHIVOS MODIFICADOS:
+  - Helpers/VehicleRecoveryHelper.cs (método RecoverLostVehicles)
+ESTADO: RESUELTO
+
+================================================================================
+BUG 47 — iFruit ScaleForm corrupto (teléfono negro durante llamadas nativas)
 ================================================================================
 SÍNTOMA:
   Durante llamadas nativas del juego (por ejemplo, a Lester, a la policía o
@@ -815,12 +846,11 @@ ARCHIVO:
 ESTADO: NO RESUELTO (limitación aceptada)
 
 ================================================================================
-BUG 47 — C# limitación: spawn de addons pesados (H2, Supra, etc.)
+BUG 48 — C# limitación: spawn de addons pesados
 ================================================================================
 SÍNTOMA:
-  Al restaurar vehículos addon pesados (por ejemplo, H2, Supra), el mod muestra
-  el mensaje "No se pudo cargar el modelo {modelo}. Dale las gracias a la kk de C#."
-  y el vehículo no aparece. Otros addons más ligeros sí spawnean correctamente.
+  Al restaurar vehículos ciertos addons, el mod muestra un mensaje de error
+  y el vehículo no aparece. Otros addons sí spawnean correctamente.
 CAUSA:
   SHVDN3 (C#) no puede esperar indefinidamente la carga de modelos addon pesados
   porque el método `Request()` tiene un timeout y el motor de streaming del juego
@@ -836,7 +866,7 @@ ARCHIVO:
 ESTADO: NO RESUELTO (limitación técnica de SHVDN3/C#)
 
 ================================================================================
-BUG 48 — Humo de neumáticos "Patriot" (blanco, rojo, azul)
+BUG 49 — Humo de neumáticos "Patriot" (blanco, rojo, azul)
 ================================================================================
 SÍNTOMA:
   Al aplicar el humo patriota en LSC, no se guarda adecuadamente. 
