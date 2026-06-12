@@ -97,62 +97,6 @@ Copian todo lo que está dentro del `.zip` y lo pegan en su carpeta `/scripts` d
 
 ```text
 📦MorsMutualInsuranceSinglePlayerMod
- ┣ 📂.git
- ┃ ┣ 📂hooks
- ┃ ┃ ┣ 📜applypatch-msg.sample
- ┃ ┃ ┣ 📜commit-msg.sample
- ┃ ┃ ┣ 📜fsmonitor-watchman.sample
- ┃ ┃ ┣ 📜post-update.sample
- ┃ ┃ ┣ 📜pre-applypatch.sample
- ┃ ┃ ┣ 📜pre-commit.sample
- ┃ ┃ ┣ 📜pre-merge-commit.sample
- ┃ ┃ ┣ 📜pre-push.sample
- ┃ ┃ ┣ 📜pre-rebase.sample
- ┃ ┃ ┣ 📜pre-receive.sample
- ┃ ┃ ┣ 📜prepare-commit-msg.sample
- ┃ ┃ ┣ 📜push-to-checkout.sample
- ┃ ┃ ┣ 📜sendemail-validate.sample
- ┃ ┃ ┗ 📜update.sample
- ┃ ┣ 📂info
- ┃ ┃ ┗ 📜exclude
- ┃ ┣ 📂logs
- ┃ ┃ ┣ 📂refs
- ┃ ┃ ┃ ┣ 📂heads
- ┃ ┃ ┃ ┃ ┣ 📜main
- ┃ ┃ ┃ ┃ ┗ 📜Working-Bench
- ┃ ┃ ┃ ┗ 📂remotes
- ┃ ┃ ┃ ┃ ┗ 📂origin
- ┃ ┃ ┃ ┃ ┃ ┣ 📜HEAD
- ┃ ┃ ┃ ┃ ┃ ┗ 📜main
- ┃ ┃ ┗ 📜HEAD
- ┃ ┣ 📂objects
- ┃ ┃ ┣ 📂27
- ┃ ┃ ┃ ┗ 📜dc4d1da5edd1352b5a7b0aa6267fc264954298
- ┃ ┃ ┣ 📂info
- ┃ ┃ ┃ ┗ 📂commit-graphs
- ┃ ┃ ┃ ┃ ┣ 📜commit-graph-chain
- ┃ ┃ ┃ ┃ ┗ 📜graph-d17a5ea7456e99a7e80db050d5ba2fc5b4eb3fed.graph
- ┃ ┃ ┗ 📂pack
- ┃ ┃ ┃ ┣ 📜pack-93542130d37fff5062d6b4ecbf898cc11d42adc5.idx
- ┃ ┃ ┃ ┣ 📜pack-93542130d37fff5062d6b4ecbf898cc11d42adc5.pack
- ┃ ┃ ┃ ┗ 📜pack-93542130d37fff5062d6b4ecbf898cc11d42adc5.rev
- ┃ ┣ 📂refs
- ┃ ┃ ┣ 📂heads
- ┃ ┃ ┃ ┣ 📜main
- ┃ ┃ ┃ ┗ 📜Working-Bench
- ┃ ┃ ┣ 📂remotes
- ┃ ┃ ┃ ┗ 📂origin
- ┃ ┃ ┃ ┃ ┣ 📜HEAD
- ┃ ┃ ┃ ┃ ┗ 📜main
- ┃ ┃ ┗ 📂tags
- ┃ ┣ 📜COMMIT_EDITMSG
- ┃ ┣ 📜config
- ┃ ┣ 📜description
- ┃ ┣ 📜FETCH_HEAD
- ┃ ┣ 📜HEAD
- ┃ ┣ 📜index
- ┃ ┣ 📜ORIG_HEAD
- ┃ ┗ 📜packed-refs
  ┣ 📂Mors Mutual Insurance - Single Player
  ┃ ┣ 📂Agency
  ┃ ┃ ┣ 📂MainMenu
