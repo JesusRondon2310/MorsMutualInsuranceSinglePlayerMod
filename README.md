@@ -9,7 +9,13 @@ Un derivado basado en el trabajo original de Bob74 (2022)
 
 ¿Cansado de perder tu vehículo tuneado de 500,000 Bs.F porque se te quedó por una misión o decidiste probar si era sumergible? ¡No esperes más y asegura tu vehículo ahora en Mors Mutual Insurance!
 
-La descarga está disponible [aquí](https://github.com/JesusRondon2310/MMI-SP-Rewrite-WIP/releases/tag/0.3)
+La descarga está disponible:
+
+[Aquí en Github](https://github.com/JesusRondon2310/MorsMutualInsuranceSinglePlayerMod/releases/tag/1.0) (obviamente, 160 de IQ 👉🧠)
+
+[En NexusMods](https://www.nexusmods.com/gta5/mods/1876)
+
+En GTA5-Mods no, porque me rechazaron por decir la verdad. Supongo que la honestidad tiene un precio.
 
 ---
 
@@ -40,7 +46,7 @@ Con las últimas versiones de las dependencias importantes instaladas y actualiz
 - [NativeUI 1.9.1](https://github.com/Guad/NativeUI/releases/)
 - [ScriptHookVDotNet Nightly (3.7.0.162 - en adelante)](https://github.com/scripthookvdotnet/scripthookvdotnet-nightly/releases)
 - [iFruitAddon2 3.1.1](https://github.com/Bob74/iFruitAddon2)
-- [Newtonsoft.Json (ya integrado en el .zip)](https://www.newtonsoft.com/json)
+- [Newtonsoft.Json](https://www.newtonsoft.com/json) (ya integrado en el .zip)
 
 Copian todo lo que está dentro del `.zip` y lo pegan en su carpeta `/scripts` dentro de su carpeta raíz de GTA V.
 
