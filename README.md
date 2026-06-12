@@ -13,7 +13,7 @@ La descarga está disponible [aquí](https://github.com/JesusRondon2310/MMI-SP-R
 
 ---
 
-## 🦜 Mi descripción
+## 🦜 Mi Descripción
 
 Hey, ¿qué tal? Aquí Platanito22, pero esta vez en ¿GTA? y ¿GTA V Legacy? Pues sí, así como lo ves, ese modder de NFS ahora hizo un mod para GTA V. ¿Sorprendido? ¿No? Ok, no importa.
 
@@ -82,6 +82,275 @@ Copian todo lo que está dentro del `.zip` y lo pegan en su carpeta `/scripts` d
 - **Apto para "Tostadoras" (Canaima Friendly)**: El mod está optimizado línea por línea. Fue diseñado pensando en escenarios extremos: PCs de muy bajos recursos corriendo el juego con 100 mods encima a 15 FPS. Si tu PC apenas puede con el juego, este script no le quitará ni un solo cuadro por segundo gracias a su sistema inteligente de dormancia.<br><br>
 
 - **Sello de Calidad "Anti-Niños"**: El control de calidad (QA) principal estuvo a cargo de mi hermano de 11 años. Su único trabajo fue jugar al caos absoluto, destruir vehículos de mil formas creativas, romper misiones y forzar el juego al límite. Si un niño de 11 años no pudo corromper la base de datos ni romper el sistema de seguros, ten por seguro que tus autos están 100% a salvo.
+
+---
+
+## 📜 Detalles del Modding
+
+### Archivos Modificados
+
+```text
+📦MorsMutualInsuranceSinglePlayerMod
+ ┣ 📂.git
+ ┃ ┣ 📂hooks
+ ┃ ┃ ┣ 📜applypatch-msg.sample
+ ┃ ┃ ┣ 📜commit-msg.sample
+ ┃ ┃ ┣ 📜fsmonitor-watchman.sample
+ ┃ ┃ ┣ 📜post-update.sample
+ ┃ ┃ ┣ 📜pre-applypatch.sample
+ ┃ ┃ ┣ 📜pre-commit.sample
+ ┃ ┃ ┣ 📜pre-merge-commit.sample
+ ┃ ┃ ┣ 📜pre-push.sample
+ ┃ ┃ ┣ 📜pre-rebase.sample
+ ┃ ┃ ┣ 📜pre-receive.sample
+ ┃ ┃ ┣ 📜prepare-commit-msg.sample
+ ┃ ┃ ┣ 📜push-to-checkout.sample
+ ┃ ┃ ┣ 📜sendemail-validate.sample
+ ┃ ┃ ┗ 📜update.sample
+ ┃ ┣ 📂info
+ ┃ ┃ ┗ 📜exclude
+ ┃ ┣ 📂logs
+ ┃ ┃ ┣ 📂refs
+ ┃ ┃ ┃ ┣ 📂heads
+ ┃ ┃ ┃ ┃ ┣ 📜main
+ ┃ ┃ ┃ ┃ ┗ 📜Working-Bench
+ ┃ ┃ ┃ ┗ 📂remotes
+ ┃ ┃ ┃ ┃ ┗ 📂origin
+ ┃ ┃ ┃ ┃ ┃ ┣ 📜HEAD
+ ┃ ┃ ┃ ┃ ┃ ┗ 📜main
+ ┃ ┃ ┗ 📜HEAD
+ ┃ ┣ 📂objects
+ ┃ ┃ ┣ 📂27
+ ┃ ┃ ┃ ┗ 📜dc4d1da5edd1352b5a7b0aa6267fc264954298
+ ┃ ┃ ┣ 📂info
+ ┃ ┃ ┃ ┗ 📂commit-graphs
+ ┃ ┃ ┃ ┃ ┣ 📜commit-graph-chain
+ ┃ ┃ ┃ ┃ ┗ 📜graph-d17a5ea7456e99a7e80db050d5ba2fc5b4eb3fed.graph
+ ┃ ┃ ┗ 📂pack
+ ┃ ┃ ┃ ┣ 📜pack-93542130d37fff5062d6b4ecbf898cc11d42adc5.idx
+ ┃ ┃ ┃ ┣ 📜pack-93542130d37fff5062d6b4ecbf898cc11d42adc5.pack
+ ┃ ┃ ┃ ┗ 📜pack-93542130d37fff5062d6b4ecbf898cc11d42adc5.rev
+ ┃ ┣ 📂refs
+ ┃ ┃ ┣ 📂heads
+ ┃ ┃ ┃ ┣ 📜main
+ ┃ ┃ ┃ ┗ 📜Working-Bench
+ ┃ ┃ ┣ 📂remotes
+ ┃ ┃ ┃ ┗ 📂origin
+ ┃ ┃ ┃ ┃ ┣ 📜HEAD
+ ┃ ┃ ┃ ┃ ┗ 📜main
+ ┃ ┃ ┗ 📂tags
+ ┃ ┣ 📜COMMIT_EDITMSG
+ ┃ ┣ 📜config
+ ┃ ┣ 📜description
+ ┃ ┣ 📜FETCH_HEAD
+ ┃ ┣ 📜HEAD
+ ┃ ┣ 📜index
+ ┃ ┣ 📜ORIG_HEAD
+ ┃ ┗ 📜packed-refs
+ ┣ 📂Mors Mutual Insurance - Single Player
+ ┃ ┣ 📂Agency
+ ┃ ┃ ┣ 📂MainMenu
+ ┃ ┃ ┃ ┣ 📂Buttons
+ ┃ ┃ ┃ ┃ ┣ 📜Build.cs
+ ┃ ┃ ┃ ┃ ┗ 📜Fill.cs
+ ┃ ┃ ┃ ┣ 📂SubMenus
+ ┃ ┃ ┃ ┃ ┣ 📜CancelHandler.cs
+ ┃ ┃ ┃ ┃ ┗ 📜RecoverHandler.cs
+ ┃ ┃ ┃ ┣ 📜Action.cs
+ ┃ ┃ ┃ ┣ 📜Cancel.cs
+ ┃ ┃ ┃ ┣ 📜ExecuteRebuild.cs
+ ┃ ┃ ┃ ┣ 📜Insure.cs
+ ┃ ┃ ┃ ┣ 📜Recover.cs
+ ┃ ┃ ┃ ┗ 📜UI.cs
+ ┃ ┃ ┣ 📂Office
+ ┃ ┃ ┃ ┣ 📂Ambient
+ ┃ ┃ ┃ ┃ ┣ 📜Builder.cs
+ ┃ ┃ ┃ ┃ ┣ 📜CleanUp.cs
+ ┃ ┃ ┃ ┃ ┣ 📜CollectionPicker.cs
+ ┃ ┃ ┃ ┃ ┣ 📜Handler.cs
+ ┃ ┃ ┃ ┃ ┗ 📜NpcHandler.cs
+ ┃ ┃ ┃ ┣ 📂Entry
+ ┃ ┃ ┃ ┃ ┣ 📜CancelSequence.cs
+ ┃ ┃ ┃ ┃ ┣ 📜EnterSequence.cs
+ ┃ ┃ ┃ ┃ ┣ 📜ExitSequence.cs
+ ┃ ┃ ┃ ┃ ┗ 📜Handler.cs
+ ┃ ┃ ┃ ┣ 📜Config.cs
+ ┃ ┃ ┃ ┣ 📜CutsceneManager.cs
+ ┃ ┃ ┃ ┗ 📜Manager.cs
+ ┃ ┃ ┣ 📜Cutscenes.cs
+ ┃ ┃ ┣ 📜ItemsManager.cs
+ ┃ ┃ ┗ 📜Reception.cs
+ ┃ ┣ 📂Config
+ ┃ ┃ ┣ 📜ModSettings.cs
+ ┃ ┃ ┗ 📜Persistence.cs
+ ┃ ┣ 📂DB
+ ┃ ┃ ┣ 📜Core.cs
+ ┃ ┃ ┣ 📜Queries.cs
+ ┃ ┃ ┣ 📜VehicleData.cs
+ ┃ ┃ ┗ 📜VehicleDataBuilder.cs
+ ┃ ┣ 📂Debug
+ ┃ ┃ ┣ 📜Debug.cs
+ ┃ ┃ ┣ 📜Logger.cs
+ ┃ ┃ ┗ 📜Trailer.cs
+ ┃ ┣ 📂Dialogue
+ ┃ ┃ ┣ 📜AudioPlayer.cs
+ ┃ ┃ ┣ 📜Core.cs
+ ┃ ┃ ┣ 📜VolumeAdjustedDataReader.cs
+ ┃ ┃ ┗ 📜WavHeaderReader.cs
+ ┃ ┣ 📂Dormancy
+ ┃ ┃ ┣ 📜Core.cs
+ ┃ ┃ ┣ 📜DespawnHandler.cs
+ ┃ ┃ ┣ 📜DormancyLifeCycle.cs
+ ┃ ┃ ┗ 📜RespawnHandler.cs
+ ┃ ┣ 📂Helpers
+ ┃ ┃ ┣ 📂Blips
+ ┃ ┃ ┃ ┣ 📜BlipCleanupHandler.cs
+ ┃ ┃ ┃ ┣ 📜RecoverBlipHandler.cs
+ ┃ ┃ ┃ ┣ 📜StaticBlipHandler.cs
+ ┃ ┃ ┃ ┗ 📜VehicleBlipHandler.cs
+ ┃ ┃ ┣ 📂Spawn
+ ┃ ┃ ┃ ┣ 📂Coordinates
+ ┃ ┃ ┃ ┃ ┣ 📜EntityPositon.cs
+ ┃ ┃ ┃ ┃ ┣ 📜MMIWarehouse.cs
+ ┃ ┃ ┃ ┃ ┣ 📜RecoverNodeSelector.cs
+ ┃ ┃ ┃ ┃ ┗ 📜SpawnHandler.cs
+ ┃ ┃ ┃ ┣ 📜InteriorVehicleRestorer.cs
+ ┃ ┃ ┃ ┣ 📜VehicleCustomizer.cs
+ ┃ ┃ ┃ ┣ 📜VehicleRestorer.cs
+ ┃ ┃ ┃ ┗ 📜VehicleSpawnManager.cs
+ ┃ ┃ ┣ 📜Constants.cs
+ ┃ ┃ ┣ 📜Diagnostics.cs
+ ┃ ┃ ┣ 📜InputHandler.cs
+ ┃ ┃ ┣ 📜Notification.cs
+ ┃ ┃ ┣ 📜Screen.cs
+ ┃ ┃ ┣ 📜Sprite.cs
+ ┃ ┃ ┣ 📜Teleport.cs
+ ┃ ┃ ┣ 📜Timers.cs
+ ┃ ┃ ┣ 📜VehicleDataHelper.cs
+ ┃ ┃ ┣ 📜VehicleIdentifier.cs
+ ┃ ┃ ┣ 📜VehicleKey.cs
+ ┃ ┃ ┣ 📜VehiclePersistence.cs
+ ┃ ┃ ┣ 📜VehicleRecoveryHelper.cs
+ ┃ ┃ ┗ 📜VehiclesInGarage.cs
+ ┃ ┣ 📂iFruit
+ ┃ ┃ ┣ 📂Config
+ ┃ ┃ ┃ ┣ 📜ConfigMenu.cs
+ ┃ ┃ ┃ ┗ 📜ConfigMenuBuilder.cs
+ ┃ ┃ ┣ 📂Mechanic
+ ┃ ┃ ┃ ┣ 📜MechanicItemFactory.cs
+ ┃ ┃ ┃ ┣ 📜MechanicMenu.cs
+ ┃ ┃ ┃ ┣ 📜MechanicMenuBuilder.cs
+ ┃ ┃ ┃ ┗ 📜MechanicSound.cs
+ ┃ ┃ ┣ 📂MMI
+ ┃ ┃ ┃ ┣ 📜MMIMenu.cs
+ ┃ ┃ ┃ ┣ 📜MMIMenuBuilder.cs
+ ┃ ┃ ┃ ┗ 📜MMISound.cs
+ ┃ ┃ ┣ 📜Core.cs
+ ┃ ┃ ┣ 📜MenuBase.cs
+ ┃ ┃ ┗ 📜UI.cs
+ ┃ ┣ 📂Insurance
+ ┃ ┃ ┣ 📂Delivery
+ ┃ ┃ ┃ ┣ 📜Bring.cs
+ ┃ ┃ ┃ ┣ 📜Completion.cs
+ ┃ ┃ ┃ ┣ 📜Incoming.cs
+ ┃ ┃ ┃ ┣ 📜Manager.cs
+ ┃ ┃ ┃ ┣ 📜TrackVehicleState.cs
+ ┃ ┃ ┃ ┗ 📜VehicleTeleport.cs
+ ┃ ┃ ┣ 📂Observer
+ ┃ ┃ ┃ ┣ 📂LockVehicle
+ ┃ ┃ ┃ ┃ ┣ 📜DataPersistence.cs
+ ┃ ┃ ┃ ┃ ┣ 📜Feedback.cs
+ ┃ ┃ ┃ ┃ ┣ 📜Handler.cs
+ ┃ ┃ ┃ ┃ ┗ 📜StateChanger.cs
+ ┃ ┃ ┃ ┣ 📂Recovery
+ ┃ ┃ ┃ ┃ ┣ 📜Handler.cs
+ ┃ ┃ ┃ ┃ ┣ 📜KeyManager.cs
+ ┃ ┃ ┃ ┃ ┣ 📜RemoveVehicleObservation.cs
+ ┃ ┃ ┃ ┃ ┗ 📜VehicleRegister..cs
+ ┃ ┃ ┃ ┣ 📜AliveVehicleDespawn.cs
+ ┃ ┃ ┃ ┣ 📜DestroyedVehicle.cs
+ ┃ ┃ ┃ ┣ 📜Garage.cs
+ ┃ ┃ ┃ ┣ 📜Initializer.cs
+ ┃ ┃ ┃ ┣ 📜Manager.cs
+ ┃ ┃ ┃ ┣ 📜MissingVehicles.cs
+ ┃ ┃ ┃ ┣ 📜VehicleChangeHandler.cs
+ ┃ ┃ ┃ ┗ 📜VehicleMonitor.cs
+ ┃ ┃ ┣ 📂Policies
+ ┃ ┃ ┃ ┣ 📜Calculator.cs
+ ┃ ┃ ┃ ┣ 📜Insurer.cs
+ ┃ ┃ ┃ ┣ 📜InsurerOperations.cs
+ ┃ ┃ ┃ ┗ 📜Manager.cs
+ ┃ ┃ ┗ 📜DestroyedVehicleRecover.cs
+ ┃ ┣ 📂PatternMatching
+ ┃ ┃ ┣ 📜Option.cs
+ ┃ ┃ ┗ 📜Result.cs
+ ┃ ┣ 📂Properties
+ ┃ ┃ ┣ 📜AssemblyInfo.cs
+ ┃ ┃ ┣ 📜Resources.Designer.cs
+ ┃ ┃ ┗ 📜Resources.resx
+ ┃ ┣ 📂Resources
+ ┃ ┃ ┣ 📜banner.png
+ ┃ ┃ ┣ 📜config.ini
+ ┃ ┃ ┣ 📜default.xml
+ ┃ ┃ ┣ 📜End_ByeNow.wav
+ ┃ ┃ ┣ 📜End_DriveSafe.wav
+ ┃ ┃ ┣ 📜End_NiceDay.wav
+ ┃ ┃ ┣ 📜End_NiveDay2.wav
+ ┃ ┃ ┣ 📜End_SoLong.wav
+ ┃ ┃ ┣ 📜End_StaySafe.wav
+ ┃ ┃ ┣ 📜insurance.png
+ ┃ ┃ ┣ 📜mechanic_1.wav
+ ┃ ┃ ┣ 📜mechanic_2.wav
+ ┃ ┃ ┣ 📜mechanic_3.wav
+ ┃ ┃ ┣ 📜mechanic_4.wav
+ ┃ ┃ ┣ 📜mechanic_5.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_1.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_10.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_11.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_12.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_2.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_3.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_4.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_5.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_6.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_7.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_8.wav
+ ┃ ┃ ┣ 📜mechanic_affirmative_9.wav
+ ┃ ┃ ┣ 📜mechanic_banner.png
+ ┃ ┃ ┣ 📜mechanic_dont_1.wav
+ ┃ ┃ ┣ 📜mechanic_dont_2.wav
+ ┃ ┃ ┣ 📜mechanic_dont_3.wav
+ ┃ ┃ ┣ 📜mechanic_dont_4.wav
+ ┃ ┃ ┣ 📜mechanic_dont_5.wav
+ ┃ ┃ ┣ 📜Mid_ICanDoThat.wav
+ ┃ ┃ ┣ 📜Mid_ILookIntoit.wav
+ ┃ ┃ ┣ 📜Mid_IWillDoMyBest.wav
+ ┃ ┃ ┣ 📜Mid_Okay.wav
+ ┃ ┃ ┣ 📜Mid_Sure.wav
+ ┃ ┃ ┣ 📜Mid_WeCanDoThat.wav
+ ┃ ┃ ┣ 📜Mid_WeCanHandleThat.wav
+ ┃ ┃ ┣ 📜NoMoney.wav
+ ┃ ┃ ┣ 📜Start_HelloThisIsMMI.wav
+ ┃ ┃ ┣ 📜Start_MMIExpectUnexpected.wav
+ ┃ ┃ ┣ 📜Start_MMIHereToHelp.wav
+ ┃ ┃ ┣ 📜Start_MMIHowCanHelp.wav
+ ┃ ┃ ┣ 📜Start_MMIHowCanIBeService.wav
+ ┃ ┃ ┣ 📜Start_MMIPeaceOfMind.wav
+ ┃ ┃ ┣ 📜Start_MMITrust.wav
+ ┃ ┃ ┣ 📜Start_WhatCanIDo.wav
+ ┃ ┃ ┗ 📜Start_WhatCanIHelpYouWith.wav
+ ┃ ┣ 📜build.ps1
+ ┃ ┣ 📜MMI.cs
+ ┃ ┣ 📜MorsMutualInsuranceMod.csproj
+ ┃ ┣ 📜MorsMutualInsuranceMod.csproj.user
+ ┃ ┗ 📜MorsMutualInsuranceMod.sln
+ ┣ 📜.gitignore
+ ┣ 📜Bugs Documentados.txt
+ ┣ 📜Changelog.md
+ ┣ 📜README.md
+ ┣ 📜Rust Simulated Pattern Matching.txt
+ ┗ 📜Sistema de Oquestacion Modular (SOM).txt
+```
 
 ---
 
