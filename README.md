@@ -304,7 +304,7 @@ Copian todo lo que está dentro del `.zip` y lo pegan en su carpeta `/scripts` d
 
 ---
 
-## 🗿 Créditos
+## 🗿 Créditos y Herramientas Utilizadas
 
 - **Desarrollo y Arquitectura:** [JesusRondon2310/Platanito22](https://github.com/JesusRondon2310).<br><br>
 - **Coder y Solucionador de bugs:** [DeepSeek: hizo el 99.95% del codigo del proyecto](https://www.deepseek.com/en/) y [Claude: solucionador de bugs criticos y dificiles de encontrar](https://claude.ai/).<br><br>
